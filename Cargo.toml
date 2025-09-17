@@ -1,0 +1,14 @@
+[workspace]
+resolver = "3"
+members = ["cli", "crates"]
+
+[workspace.dependencies]
+clap = { version = "4.5.47", features = ["derive"] }
+
+[workspace.package]
+edition = "2024"
+repository = "https://github.com/ibilalkayy/cover"
+version = "0.1.0"
+license = "Apache-2.0"
+readme = "README.md"
+categories = ["command-line-utilities"]
