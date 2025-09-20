@@ -1,0 +1,12 @@
+[package]
+name = "sync"
+edition.workspace = true
+repository.workspace = true
+version.workspace = true
+license.workspace = true
+readme.workspace = true
+categories.workspace = true
+
+[dependencies]
+walkdir.workspace = true
+time.workspace = true

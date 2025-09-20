@@ -2,6 +2,14 @@ use clap::Parser;
 
 #[derive(Debug, Parser)]
 pub struct SyncData {
+    /// Source folder to take the file from
+    #[clap(short, long)]
+    pub source: String,
+
+    /// Destination folder to move the file to
+    #[clap(short, long)]
+    pub destination: String,
+
     /// Copy only the changed files
     #[clap(long)]
     pub incremental: Option<bool>,

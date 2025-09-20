@@ -1,5 +1,5 @@
 [package]
-name = "crates"
+name = "archive"
 edition.workspace = true
 repository.workspace = true
 version.workspace = true

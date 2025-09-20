@@ -9,3 +9,9 @@ categories.workspace = true
 
 [dependencies]
 clap.workspace = true
+clean    = { path = "../crates/clean" }
+archive  = { path = "../crates/archive" }
+list     = { path = "../crates/list" }
+restore  = { path = "../crates/restore" }
+schedule = { path = "../crates/schedule" }
+sync     = { path = "../crates/sync" }
