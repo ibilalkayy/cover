@@ -54,7 +54,7 @@ dependencies = [
 
 [[package]]
 name = "archive"
-version = "0.1.1"
+version = "0.1.2"
 
 [[package]]
 name = "clap"
@@ -98,11 +98,11 @@ checksum = "b94f61472cee1439c0b966b47e3aca9ae07e45d070759512cd390ea2bebc6675"
 
 [[package]]
 name = "clean"
-version = "0.1.1"
+version = "0.1.2"
 
 [[package]]
 name = "cli"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "archive",
  "clap",
@@ -154,7 +154,7 @@ checksum = "6a82ae493e598baaea5209805c49bbf2ea7de956d50d7da0da1164f9c6d28543"
 
 [[package]]
 name = "list"
-version = "0.1.1"
+version = "0.1.2"
 
 [[package]]
 name = "num-conv"
@@ -203,7 +203,7 @@ dependencies = [
 
 [[package]]
 name = "restore"
-version = "0.1.1"
+version = "0.1.2"
 
 [[package]]
 name = "same-file"
@@ -216,7 +216,7 @@ dependencies = [
 
 [[package]]
 name = "schedule"
-version = "0.1.1"
+version = "0.1.2"
 
 [[package]]
 name = "serde"
@@ -266,7 +266,7 @@ dependencies = [
 
 [[package]]
 name = "sync"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "time",
  "walkdir",

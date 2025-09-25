@@ -1,20 +1,14 @@
-use std::time::SystemTime;
+use std::{path::PathBuf, time::SystemTime};
 use walkdir::{DirEntry, WalkDir};
 
 pub struct SyncData {
-    pub source: String,
-    pub destination: String,
+    pub source: PathBuf,
+    pub destination: PathBuf,
     pub incremental: Option<bool>,
     pub delete: Option<bool>,
     pub dry_run: Option<bool>,
     pub verbose: Option<bool>,
     pub hash: Option<bool>,
-}
-
-fn file_name(source_entry: DirEntry) {
-    if let Some(name) = source_entry.path().file_name() {
-        println!("File: {}", name.to_string_lossy());
-    }
 }
 
 fn file_types(source_entry: DirEntry) {
@@ -58,27 +52,51 @@ fn file_last_modified(source_entry: DirEntry) {
 
 impl SyncData {
     pub fn sync_output(&self) {
-        for source_entry in WalkDir::new(&self.source) {
-            let source_entry = source_entry.expect("Err: failed to get the source entry");
-            let file_type = source_entry.file_type();
-
-            if file_type.is_file() {
-                file_name(source_entry.clone());
-                file_types(source_entry.clone());
-                file_last_modified(source_entry);
+        let mut source_files: Vec<PathBuf> = Vec::new();
+        for entry in WalkDir::new(&self.source) {
+            let entry = entry.expect("Err: failed to get the source entry");
+            if entry.file_type().is_file() {
+                source_files.push(entry.path().to_path_buf());
+                // file_types(source_entry.clone());
+                // file_last_modified(source_entry);
             }
         }
 
-        for destination_entry in WalkDir::new(&self.destination) {
-            let destination_entry =
-                destination_entry.expect("Err: failed to get the destination entry");
-            let file_type = destination_entry.file_type();
-
-            if file_type.is_file() {
-                file_name(destination_entry.clone());
-                file_types(destination_entry.clone());
-                file_last_modified(destination_entry);
+        let mut destination_files: Vec<PathBuf> = Vec::new();
+        for entry in WalkDir::new(&self.destination) {
+            let entry = entry.expect("Err: failed to get the destination entry");
+            if entry.file_type().is_file() {
+                destination_files.push(entry.path().to_path_buf());
+                // file_types(entry.clone());
+                // file_last_modified(entry);
             }
+        }
+
+        let mut copied_files = Vec::new();
+        for src in &source_files {
+            let src_file_name = src.file_name().expect("Err: failed to get the file name");
+
+            let mut dest_path = self.destination.clone();
+            dest_path.push(src_file_name);
+
+            let mut found = false;
+            for dest in &destination_files {
+                let dest_file_name = dest.file_name().expect("Err: failed to get the file name");
+                if src_file_name == dest_file_name {
+                    found = true;
+                }
+            }
+
+            if !found {
+                std::fs::copy(src, dest_path).unwrap();
+                copied_files.push(src_file_name.to_owned());
+            }
+        }
+
+        if !copied_files.is_empty() {
+            println!("Missing files are copied successfully");
+        } else {
+            eprintln!("No missing files to copy. Destination is up-to-date.");
         }
 
         // println!("{}", self.incremental.unwrap());

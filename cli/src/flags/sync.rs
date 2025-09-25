@@ -1,14 +1,16 @@
+use std::path::PathBuf;
+
 use clap::Parser;
 
 #[derive(Debug, Parser)]
 pub struct SyncData {
     /// Source folder to take the file from
     #[clap(short, long)]
-    pub source: String,
+    pub source: PathBuf,
 
     /// Destination folder to move the file to
     #[clap(short, long)]
-    pub destination: String,
+    pub destination: PathBuf,
 
     /// Copy only the changed files
     #[clap(long)]
