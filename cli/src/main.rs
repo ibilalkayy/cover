@@ -17,7 +17,7 @@ fn handle_commands() {
             let sync_data = SyncData {
                 source: s.source,
                 destination: s.destination,
-                incremental: s.incremental,
+                changed_only: s.changed_only,
                 delete: s.delete,
                 dry_run: s.dry_run,
                 verbose: s.verbose,

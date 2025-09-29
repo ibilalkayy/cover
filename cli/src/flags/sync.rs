@@ -14,21 +14,21 @@ pub struct SyncData {
 
     /// Copy only the changed files
     #[clap(long)]
-    pub incremental: Option<bool>,
+    pub changed_only: bool,
 
     /// Remove files in destination not in source
     #[clap(long)]
-    pub delete: Option<bool>,
+    pub delete: bool,
 
     /// Show what would happen after syncing
     #[clap(long)]
-    pub dry_run: Option<bool>,
+    pub dry_run: bool,
 
     /// Show detailed logs
     #[clap(long)]
-    pub verbose: Option<bool>,
+    pub verbose: bool,
 
     /// Check file hashes instead of timestamps
     #[clap(long)]
-    pub hash: Option<bool>,
+    pub hash: bool,
 }

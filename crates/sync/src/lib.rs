@@ -1,5 +1,6 @@
 use std::{
-    path::PathBuf,
+    fs::copy,
+    path::{Path, PathBuf},
     time::{SystemTime, UNIX_EPOCH},
 };
 use time::{OffsetDateTime, macros::format_description};
@@ -8,11 +9,11 @@ use walkdir::{DirEntry, WalkDir};
 pub struct SyncData {
     pub source: PathBuf,
     pub destination: PathBuf,
-    pub incremental: Option<bool>,
-    pub delete: Option<bool>,
-    pub dry_run: Option<bool>,
-    pub verbose: Option<bool>,
-    pub hash: Option<bool>,
+    pub changed_only: bool,
+    pub delete: bool,
+    pub dry_run: bool,
+    pub verbose: bool,
+    pub hash: bool,
 }
 
 fn file_size(source_entry: DirEntry) -> (f64, &'static str) {
@@ -84,47 +85,71 @@ impl SyncData {
             }
         }
 
-        // Compare source and destination files
-        for (src_path, src_modified) in &source_files {
-            let src_file_name = src_path
-                .file_name()
-                .expect("Err: failed to get the file name");
-            let mut dest_path = self.destination.clone();
-            dest_path.push(src_file_name);
-
-            let mut found = false;
-            let mut needs_update = false;
-
-            for (dest_path, dest_modified) in &destination_files {
-                let dest_file_name = dest_path
+        if self.changed_only {
+            // Compare source and destination files
+            for (src_path, src_modified) in &source_files {
+                let src_file_name = src_path
                     .file_name()
-                    .expect("Err: failed to get the file name");
-                if src_file_name == dest_file_name {
-                    found = true;
-                    if src_modified > dest_modified {
-                        needs_update = true;
+                    .expect("Err: failed to get the file name(s)");
+                let mut dest_path = self.destination.clone();
+                dest_path.push(src_file_name);
+
+                let mut found = false;
+                let mut needs_update = false;
+
+                for (dest_path, dest_modified) in &destination_files {
+                    let dest_file_name = dest_path
+                        .file_name()
+                        .expect("Err: failed to get the file name(s)");
+                    if src_file_name == dest_file_name {
+                        found = true;
+                        if src_modified > dest_modified {
+                            needs_update = true;
+                        }
+                        break;
                     }
-                    break;
+                }
+
+                if !found {
+                    std::fs::copy(src_path, &dest_path).expect("Err: failed to copy file(s)");
+                    files_to_be_copied.push(src_file_name.to_owned());
+                } else if needs_update {
+                    std::fs::copy(src_path, &dest_path).expect("Err: failed to update file(s)");
+                    files_to_be_updated.push(src_file_name.to_owned());
                 }
             }
 
-            if !found {
-                std::fs::copy(src_path, &dest_path).expect("Err: failed to copy file");
-                files_to_be_copied.push(src_file_name.to_owned());
-            } else if needs_update {
-                std::fs::copy(src_path, &dest_path).expect("Err: failed to update file");
-                files_to_be_updated.push(src_file_name.to_owned());
+            if !files_to_be_copied.is_empty() {
+                println!(
+                    "Missing files {:?} are copied to {:?} destination",
+                    files_to_be_copied, self.destination
+                );
             }
-        }
+            if !files_to_be_updated.is_empty() {
+                println!("Files are updated: {:?}", files_to_be_updated);
+            }
+            if files_to_be_copied.is_empty() && files_to_be_updated.is_empty() {
+                eprintln!("No missing or outdated files. Destination is up-to-date.");
+            }
+        } else {
+            if !destination_files.is_empty() {
+                for (dest_path, _) in &destination_files {
+                    std::fs::remove_file(dest_path).expect("Err: failed to delete the file(s)");
+                }
 
-        if !files_to_be_copied.is_empty() {
-            println!("Missing files copied: {:?}", files_to_be_copied);
-        }
-        if !files_to_be_updated.is_empty() {
-            println!("Files updated: {:?}", files_to_be_updated);
-        }
-        if files_to_be_copied.is_empty() && files_to_be_updated.is_empty() {
-            eprintln!("No missing or outdated files. Destination is up-to-date.");
+                let dest_dir = Path::new(&self.destination);
+
+                for (src_path, _) in &source_files {
+                    let file_name = src_path
+                        .file_name()
+                        .expect("Err: failed to get the file name(s)");
+                    let new_dest_path = dest_dir.join(file_name);
+                    copy(src_path, new_dest_path).expect("Err: failed to copy the file(s)");
+                }
+                println!("All the files are copied to destination successfully");
+            } else {
+                eprintln!("Err: destination path is empty");
+            }
         }
     }
 
