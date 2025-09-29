@@ -1,5 +1,5 @@
 use std::{
-    fs::copy,
+    fs::{copy, remove_file},
     path::{Path, PathBuf},
     time::{SystemTime, UNIX_EPOCH},
 };
@@ -149,6 +149,33 @@ impl SyncData {
                 println!("All the files are copied to destination successfully");
             } else {
                 eprintln!("Err: destination path is empty");
+            }
+        }
+
+        if self.delete {
+            for (src_path, _) in &source_files {
+                let src_file_name = src_path
+                    .file_name()
+                    .expect("Err: failed to get the file name(s)");
+                let mut dest_path = self.destination.clone();
+                dest_path.push(src_file_name);
+
+                let mut found = false;
+
+                for (dest_path, _) in &destination_files {
+                    let dest_file_name = dest_path
+                        .file_name()
+                        .expect("Err: failed to get the file name(s)");
+                    if src_file_name == dest_file_name {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if !found {
+                    remove_file(dest_path).expect("Err: failed to remove the file(s)");
+                }
+                println!("Non-matching destination files are now deleted");
             }
         }
     }
