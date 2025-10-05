@@ -2,13 +2,14 @@ pub mod commands;
 pub mod flags;
 
 use crate::commands::commands::{Command, Cover};
+use sync::SyncData;
+
 use archive::ArchiveData;
 use clap::Parser;
 use clean::CleanData;
 use list::ListData;
 use restore::RestoreData;
 use schedule::ScheduleData;
-use sync::SyncData;
 
 fn handle_commands() {
     let cover = Cover::parse();
