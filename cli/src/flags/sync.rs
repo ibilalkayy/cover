@@ -27,8 +27,7 @@ pub struct SyncData {
     /// Show detailed logs
     #[clap(long)]
     pub verbose: bool,
-
-    /// Check file hashes instead of timestamps
-    #[clap(long)]
-    pub hash: bool,
+    // /// Check file hashes instead of timestamps
+    // #[clap(long)]
+    // pub hash: bool,
 }

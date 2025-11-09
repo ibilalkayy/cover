@@ -2,27 +2,24 @@ pub mod commands;
 pub mod flags;
 
 use crate::commands::commands::{Command, Cover};
-use sync::SyncData;
-
-use archive::ArchiveData;
+use backup::{
+    archive::archive::ArchiveData, clean::clean::CleanData, list::list::ListData,
+    restore::restore::RestoreData, schedule::schedule::ScheduleData, sync::sync::SyncData,
+};
 use clap::Parser;
-use clean::CleanData;
-use list::ListData;
-use restore::RestoreData;
-use schedule::ScheduleData;
 
 fn handle_commands() {
     let cover = Cover::parse();
     match cover.command {
         Command::Sync(s) => {
-            let sync_data = SyncData {
+            let mut sync_data = SyncData {
                 source: s.source,
                 destination: s.destination,
                 changed_only: s.changed_only,
                 delete: s.delete,
                 dry_run: s.dry_run,
                 verbose: s.verbose,
-                hash: s.hash,
+                // hash: s.hash,
             };
             sync_data.sync_options();
         }
