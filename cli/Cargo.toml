@@ -10,8 +10,3 @@ categories.workspace = true
 [dependencies]
 clap.workspace = true
 backup    = { path = "../crates/backup" }
-# archive  = { path = "../crates/backup/src/archive" }
-# list     = { path = "../crates/backup/src/list" }
-# restore  = { path = "../crates/backup/src/restore" }
-# schedule = { path = "../crates/backup/src/schedule" }
-# sync     = { path = "../crates/backup/src/sync" }
