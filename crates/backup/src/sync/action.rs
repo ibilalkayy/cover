@@ -63,10 +63,9 @@ impl SyncData {
         }
     }
 
-    pub fn overwrite_with_src(&self, file_name: PathBuf) {
+    pub fn overwrite_with_src(&self, file_name: PathBuf) -> bool {
         let src_files = self.list_source_files();
         let dest_files = self.list_destination_files();
-        let mut found = false;
 
         for src_file in src_files {
             for dest_file in &dest_files {
@@ -89,14 +88,13 @@ impl SyncData {
                     let src_file = Path::new(&self.source).join(file_name.clone());
                     copy(&src_file, &dest_file).expect("Err: failed to copy the file");
 
-                    println!("Msg: destination file(s) modification not allowed");
-                    found = true;
+                    return true;
+                } else {
+                    return false;
                 }
             }
         }
-        if !found {
-            eprintln!("Err: no changes detected");
-        }
+        false
     }
 
     pub fn remove_all_dest_files(&self) {

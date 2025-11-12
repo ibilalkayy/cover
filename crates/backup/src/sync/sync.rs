@@ -11,6 +11,11 @@ pub struct SyncData {
 
 impl SyncData {
     pub fn sync_output(&mut self) {
+        if !self.src_dest_dir_present() {
+            eprintln!("Err: missing source or destination directories");
+            return;
+        }
+
         if !self.single_command_selected() {
             eprintln!("Err: entering multiple flags are not allowed");
             return;
@@ -18,11 +23,6 @@ impl SyncData {
 
         match (self.changed_only, self.delete, self.dry_run, self.verbose) {
             (true, _, _, _) => {
-                if !self.src_dest_dir_present() {
-                    eprintln!("Err: missing source or destination directories");
-                    return;
-                }
-
                 let src_created = self.src_file_created();
                 let (modified_src_file, src_modified) = self.src_file_modified();
 
@@ -43,9 +43,13 @@ impl SyncData {
                         println!("Msg: destination file(s) creation not allowed");
                     }
                     (_, _, _, true) => {
-                        self.overwrite_with_src(modified_dest_file);
+                        if self.overwrite_with_src(modified_dest_file) {
+                            eprintln!("Err: destination file(s) is modified, and it's not allowed");
+                        } else {
+                            println!("Status: no changes detected");
+                        }
                     }
-                    _ => eprintln!("Err: no changes detected"),
+                    _ => {}
                 }
             }
             (_, true, _, _) => {
@@ -53,11 +57,6 @@ impl SyncData {
                 println!("Success: Destination files are successfully deleted");
             }
             (_, _, true, _) => {
-                if !self.src_dest_dir_present() {
-                    eprintln!("[DRY RUN]: Would create the source and destination directories");
-                    return;
-                }
-
                 let src_created = self.src_file_created();
                 let (_, src_modified) = self.src_file_modified();
 
@@ -85,11 +84,6 @@ impl SyncData {
                 }
             }
             (_, _, _, true) => {
-                if !self.src_dest_dir_present() {
-                    eprintln!("Err: missing source or destination directories");
-                    return;
-                }
-
                 let src_created = self.src_file_created();
                 let (modified_src_file, src_modified) = self.src_file_modified();
 

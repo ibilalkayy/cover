@@ -5,6 +5,10 @@ impl SyncData {
         let src_not_empty = !self.source.to_string_lossy().trim().is_empty();
         let dest_not_empty = !self.destination.to_string_lossy().trim().is_empty();
 
+        if !self.source.exists() && !self.destination.exists() {
+            return false;
+        }
+
         if !self.source.is_dir() || !self.destination.is_dir() {
             return false;
         }
@@ -19,10 +23,6 @@ impl SyncData {
     pub fn single_command_selected(&mut self) -> bool {
         let source_contains = !self.source.to_string_lossy().trim().is_empty();
         let destination_contains = !self.destination.to_string_lossy().trim().is_empty();
-
-        if !self.source.exists() && !self.destination.exists() {
-            return true;
-        }
 
         if !self.source.is_dir() && !self.destination.is_dir() {
             return false;
