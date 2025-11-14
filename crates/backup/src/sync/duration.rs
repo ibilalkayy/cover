@@ -16,26 +16,26 @@ impl SyncData {
 
         let src_meta = metadata(&src_path)
             .ok()
-            .expect("Err: failed to get the source metadata");
+            .expect("[ERROR]: failed to get the source metadata");
         let dest_meta = metadata(&dest_path).ok();
 
         let src_numeric = src_meta
             .modified()
             .ok()
-            .expect("Err: failed to check the modification")
+            .expect("[ERROR]: failed to check the modification")
             .duration_since(UNIX_EPOCH)
             .ok()
-            .expect("Err: failed to get the duration")
+            .expect("[ERROR]: failed to get the duration")
             .as_secs() as f64;
 
         let dest_numeric = if let Some(dest_meta) = dest_meta {
             dest_meta
                 .modified()
                 .ok()
-                .expect("Err: failed to check the modification")
+                .expect("[ERROR]: failed to check the modification")
                 .duration_since(UNIX_EPOCH)
                 .ok()
-                .expect("Err: failed to get the duration")
+                .expect("[ERROR]: failed to get the duration")
                 .as_secs() as f64
         } else {
             0.0

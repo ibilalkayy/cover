@@ -11,10 +11,10 @@ impl SyncData {
         for src_file in src_files {
             let file_name = src_file
                 .file_name()
-                .expect("Err: failed to get the filenames");
+                .expect("[ERROR]: failed to get the filenames");
             let dest_path = Path::new(&self.destination).join(file_name);
             if !dest_path.exists() {
-                copy(&src_file, &dest_path).expect("Err: failed to copy the files");
+                copy(&src_file, &dest_path).expect("[ERROR]: failed to copy the files");
             }
         }
     }
@@ -24,9 +24,9 @@ impl SyncData {
         for dest_file in dest_files {
             let file_name = dest_file
                 .file_name()
-                .expect("Err: failed to get the file name");
+                .expect("[ERROR]: failed to get the file name");
             let dest_path = Path::new(&self.destination).join(file_name);
-            remove_file(&dest_path).expect("Err: failed to remove a file");
+            remove_file(&dest_path).expect("[ERROR]: failed to remove a file");
         }
         self.copy_src_to_destination();
     }
@@ -36,13 +36,13 @@ impl SyncData {
         for dest_file in dest_files {
             let found_dest_file = dest_file
                 .file_name()
-                .expect("Err: failed to get the file name");
+                .expect("[ERROR]: failed to get the file name");
             let modified_src_file = file_name
                 .file_name()
-                .expect("Err: failed to get the file name");
+                .expect("[ERROR]: failed to get the file name");
 
             if found_dest_file == modified_src_file {
-                remove_file(dest_file).expect("Err: failed to remove the file");
+                remove_file(dest_file).expect("[ERROR]: failed to remove the file");
                 break;
             }
         }
@@ -51,14 +51,14 @@ impl SyncData {
         for src_file in src_files {
             let found_src_file = src_file
                 .file_name()
-                .expect("Err: failed to get the file name");
+                .expect("[ERROR]: failed to get the file name");
             let modified_src_file = file_name
                 .file_name()
-                .expect("Err: failed to get the file name");
+                .expect("[ERROR]: failed to get the file name");
 
             if found_src_file == modified_src_file {
                 let dest_path = Path::new(&self.destination).join(&file_name);
-                copy(&src_file, &dest_path).expect("Err: failed to copy the file");
+                copy(&src_file, &dest_path).expect("[ERROR]: failed to copy the file");
             }
         }
     }
@@ -70,23 +70,23 @@ impl SyncData {
         for src_file in src_files {
             for dest_file in &dest_files {
                 let src_file_content =
-                    read_to_string(&src_file).expect("Err: failed to read the file");
+                    read_to_string(&src_file).expect("[ERROR]: failed to read the file");
                 let dest_file_content =
-                    read_to_string(&dest_file).expect("Err: failed to read the file");
+                    read_to_string(&dest_file).expect("[ERROR]: failed to read the file");
 
                 let given_dest_file = file_name
                     .file_name()
-                    .expect("Err: failed to get the file name");
+                    .expect("[ERROR]: failed to get the file name");
 
                 let found_dest_file = dest_file
                     .file_name()
-                    .expect("Err: failed to get the file name");
+                    .expect("[ERROR]: failed to get the file name");
 
                 if given_dest_file == found_dest_file && src_file_content != dest_file_content {
-                    remove_file(&dest_file).expect("Err: failed to remove the file");
+                    remove_file(&dest_file).expect("[ERROR]: failed to remove the file");
 
                     let src_file = Path::new(&self.source).join(file_name.clone());
-                    copy(&src_file, &dest_file).expect("Err: failed to copy the file");
+                    copy(&src_file, &dest_file).expect("[ERROR]: failed to copy the file");
 
                     return true;
                 } else {
@@ -102,9 +102,9 @@ impl SyncData {
         for dest_file in dest_files {
             let file_name = dest_file
                 .file_name()
-                .expect("Err: failed to get the file name");
+                .expect("[ERROR]: failed to get the file name");
             let dest_path = Path::new(&self.destination).join(file_name);
-            remove_file(&dest_path).expect("Err: failed to remove a file");
+            remove_file(&dest_path).expect("[ERROR]: failed to remove a file");
         }
     }
 }

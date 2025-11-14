@@ -9,104 +9,167 @@ pub struct SyncData {
     pub verbose: bool,
 }
 
+pub enum FileState {
+    SrcCreated,
+    SrcModified,
+    DestCreated,
+    DestModified,
+    NoChange,
+}
+
+pub enum FileAction {
+    ChangedOnly,
+    Delete,
+    DryRun,
+    Verbose,
+}
+
 impl SyncData {
+    pub fn to_action(&self) -> FileAction {
+        if self.changed_only {
+            FileAction::ChangedOnly
+        } else if self.delete {
+            FileAction::Delete
+        } else if self.dry_run {
+            FileAction::DryRun
+        } else if self.verbose {
+            FileAction::Verbose
+        } else {
+            FileAction::Verbose
+        }
+    }
+
+    pub fn to_state(&self, condition: &mut [bool]) -> FileState {
+        if condition[0] {
+            FileState::SrcCreated
+        } else if condition[1] {
+            FileState::SrcModified
+        } else if condition[2] {
+            FileState::DestCreated
+        } else if condition[3] {
+            FileState::DestModified
+        } else {
+            FileState::NoChange
+        }
+    }
+
     pub fn sync_output(&mut self) {
         if !self.src_dest_dir_present() {
-            eprintln!("Err: missing source or destination directories");
+            eprintln!("[ERROR]: missing source or destination directories");
             return;
         }
 
         if !self.single_command_selected() {
-            eprintln!("Err: entering multiple flags are not allowed");
+            eprintln!("[ERROR]: entering multiple flags are not allowed");
             return;
         }
 
-        match (self.changed_only, self.delete, self.dry_run, self.verbose) {
-            (true, _, _, _) => {
+        let action = self.to_action();
+        match action {
+            FileAction::ChangedOnly => {
                 let src_created = self.src_file_created();
                 let (modified_src_file, src_modified) = self.src_file_modified();
 
                 let dest_created = self.dest_file_created();
                 let (modified_dest_file, dest_modified) = self.dest_file_modified();
 
-                match (src_created, src_modified, dest_created, dest_modified) {
-                    (true, _, _, _) => {
+                let mut condition: [bool; 4] =
+                    [src_created, src_modified, dest_created, dest_modified];
+                let state = self.to_state(&mut condition);
+
+                match state {
+                    FileState::SrcCreated => {
                         self.copy_src_to_destination();
-                        println!("Success: source file(s) successfully copied");
+                        println!("[SUCCESS]: source file(s) successfully copied");
                     }
-                    (_, true, _, _) => {
+                    FileState::SrcModified => {
                         self.update_dest_file(modified_src_file);
-                        println!("Success: destination file(s) successfully updated");
+                        println!("[SUCCESS]: destination file(s) successfully updated");
                     }
-                    (_, _, true, _) => {
+                    FileState::DestCreated => {
                         self.remove_dest_file();
-                        println!("Msg: destination file(s) creation not allowed");
+                        println!("[MSG]: destination file(s) creation not allowed");
                     }
-                    (_, _, _, true) => {
+                    FileState::DestModified => {
                         if self.overwrite_with_src(modified_dest_file) {
-                            eprintln!("Err: destination file(s) is modified, and it's not allowed");
+                            eprintln!(
+                                "[MSG]: destination file(s) content has been overwritten with the source file(s) content"
+                            );
                         } else {
-                            println!("Status: no changes detected");
+                            println!("[STATUS]: no changes detected");
                         }
                     }
-                    _ => {}
+                    FileState::NoChange => {
+                        println!("[STATUS]: no changes detected");
+                    }
                 }
             }
-            (_, true, _, _) => {
+            FileAction::Delete => {
                 self.remove_all_dest_files();
-                println!("Success: Destination files are successfully deleted");
+                println!("[SUCCESS]: Destination files are successfully deleted");
             }
-            (_, _, true, _) => {
+            FileAction::DryRun => {
                 let src_created = self.src_file_created();
                 let (_, src_modified) = self.src_file_modified();
 
                 let dest_created = self.dest_file_created();
                 let (_, dest_modified) = self.dest_file_modified();
 
-                match (src_created, src_modified, dest_created, dest_modified) {
-                    (true, _, _, _) => {
-                        println!("[DRY RUN]: Would copy the source file(s) to destination")
+                let mut condition: [bool; 4] =
+                    [src_created, src_modified, dest_created, dest_modified];
+                let state = self.to_state(&mut condition);
+
+                match state {
+                    FileState::SrcCreated => {
+                        println!("[DRY RUN]: Would copy the source file(s) to destination");
                     }
-                    (_, true, _, _) => {
+                    FileState::SrcModified => {
                         println!("[DRY RUN]: Would update the destination file(s)");
                     }
-                    (_, _, true, _) => {
+                    FileState::DestCreated => {
                         println!(
                             "[DRY RUN]: Would prevent the creation of the destination file(s)"
                         );
                     }
-                    (_, _, _, true) => {
+                    FileState::DestModified => {
                         println!(
                             "[DRY RUN]: Would overwrite the destination file(s) with source file(s)"
                         );
                     }
-                    _ => eprintln!("[DRY RUN]: Would give the error because no changes detected"),
+                    FileState::NoChange => {
+                        eprintln!("[DRY RUN]: Would give the error because no changes detected");
+                    }
                 }
             }
-            (_, _, _, true) => {
+            FileAction::Verbose => {
                 let src_created = self.src_file_created();
                 let (modified_src_file, src_modified) = self.src_file_modified();
 
                 let dest_created = self.dest_file_created();
                 let (_, dest_modified) = self.dest_file_modified();
 
-                match (src_created, src_modified, dest_created, dest_modified) {
-                    (true, _, _, _) => {
+                let mut condition: [bool; 4] =
+                    [src_created, src_modified, dest_created, dest_modified];
+                let state = self.to_state(&mut condition);
+
+                match state {
+                    FileState::SrcCreated => {
                         self.log_for_source_creation();
                     }
-                    (_, true, _, _) => {
+                    FileState::SrcModified => {
                         self.log_for_source_modification(modified_src_file);
                     }
-                    (_, _, true, _) => {
+                    FileState::DestCreated => {
                         self.log_for_dest_creation();
                     }
-                    (_, _, _, true) => {
+                    FileState::DestModified => {
                         self.log_for_dest_modification();
                     }
-                    _ => eprintln!("Err: no changes detected"),
+                    FileState::NoChange => {
+                        println!("[STATUS]: no changes detected");
+                    }
                 }
             }
-            _ => eprintln!("Err: other commands are not allowed"),
         }
     }
 

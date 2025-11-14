@@ -6,11 +6,11 @@ impl SyncData {
         let mut files_list = Vec::new();
 
         if !self.source.is_dir() {
-            eprintln!("Err: source is not a directory: {:?}", self.source);
+            eprintln!("[ERROR]: source is not a directory: {:?}", self.source);
             return Vec::new();
         }
 
-        let paths = read_dir(&self.source).expect("Err: failed to read the directory");
+        let paths = read_dir(&self.source).expect("[ERROR]: failed to read the directory");
         for entry in paths {
             match entry {
                 Ok(entry_path) => {
@@ -19,7 +19,7 @@ impl SyncData {
                         files_list.push(pathway.to_path_buf());
                     }
                 }
-                Err(error) => eprintln!("Err: {}", error),
+                Err(error) => eprintln!("[ERROR]: {}", error),
             }
         }
         return files_list;
@@ -30,13 +30,13 @@ impl SyncData {
 
         if !self.destination.is_dir() {
             eprintln!(
-                "Err: destination is not a directory: {:?}",
+                "[ERROR]: destination is not a directory: {:?}",
                 self.destination
             );
             return Vec::new();
         }
 
-        let paths = read_dir(&self.destination).expect("Err: failed to read the directory");
+        let paths = read_dir(&self.destination).expect("[ERROR]: failed to read the directory");
         for entry in paths {
             match entry {
                 Ok(entry_path) => {
@@ -45,7 +45,7 @@ impl SyncData {
                         files_list.push(pathway.to_path_buf());
                     }
                 }
-                Err(error) => eprintln!("Err: {}", error),
+                Err(error) => eprintln!("[ERROR]: {}", error),
             }
         }
         return files_list;

@@ -6,7 +6,7 @@ use std::{
 
 impl SyncData {
     pub fn src_file_created(&self) -> bool {
-        let src_entries = read_dir(&self.source).expect("Err: failed to read the source dir");
+        let src_entries = read_dir(&self.source).expect("[ERROR]: failed to read the source dir");
         for entry in src_entries.flatten() {
             let file_name = entry.file_name().to_string_lossy().to_string();
             let dest_path = Path::new(&self.destination).join(&file_name);
@@ -18,7 +18,7 @@ impl SyncData {
     }
 
     pub fn src_file_modified(&self) -> (PathBuf, bool) {
-        let src_entries = read_dir(&self.source).expect("Err: failed to read the source dir");
+        let src_entries = read_dir(&self.source).expect("[ERROR]: failed to read the source dir");
         let mut is_modified = false;
         let mut modified_file = PathBuf::new();
         let mut last_modify_numeric: Vec<f64> = Vec::new();
@@ -50,7 +50,7 @@ impl SyncData {
 
     pub fn dest_file_created(&self) -> bool {
         let dest_entries =
-            read_dir(&self.destination).expect("Err: failed to read destination dir");
+            read_dir(&self.destination).expect("[ERROR]: failed to read destination dir");
         for entry in dest_entries.flatten() {
             let file_name = entry.file_name().to_string_lossy().to_string();
             let src_path = Path::new(&self.source).join(&file_name);
@@ -62,7 +62,7 @@ impl SyncData {
     }
 
     pub fn dest_file_modified(&self) -> (PathBuf, bool) {
-        let dest_entries = read_dir(&self.destination).expect("Err: failed to read dest dir");
+        let dest_entries = read_dir(&self.destination).expect("[ERROR]: failed to read dest dir");
         let mut is_modified = false;
         let mut modified_file = PathBuf::new();
         let mut last_modify_numeric: Vec<f64> = Vec::new();

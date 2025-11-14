@@ -1,6 +1,5 @@
-use std::{fs::read_to_string, path::PathBuf};
-
 use super::sync::SyncData;
+use std::{fs::read_to_string, path::PathBuf};
 
 impl SyncData {
     pub fn log_for_source_creation(&self) {
@@ -23,7 +22,7 @@ impl SyncData {
         print!("List of destination files: ");
         if list_dest_files.is_empty() {
             println!("Empty");
-            println!("Status: Not matched");
+            println!("[STATUS]: Not matched");
             print!("Copied: ");
             self.copy_src_to_destination();
             list_src_files
@@ -33,7 +32,7 @@ impl SyncData {
             println!("-> {}", self.destination.to_string_lossy().to_string());
         } else {
             println!("Not empty");
-            println!("Status: Not matched");
+            println!("[STATUS]: Not matched");
             print!("Copied: ");
             self.copy_src_to_destination();
             list_src_files
@@ -95,15 +94,15 @@ impl SyncData {
             for dest_files in list_dest_files.clone() {
                 if src_files.file_name().unwrap() == dest_files.file_name().unwrap() {
                     println!(
-                        "Msg: {} file will stay as it is",
+                        "[MSG]: {} file will stay as it is",
                         src_files.file_name().unwrap().to_string_lossy().to_string()
                     );
                 }
 
                 if src_files.file_name().unwrap() != dest_files.file_name().unwrap() {
-                    println!("Status: Not matched");
+                    println!("[STATUS]: not matched");
                     println!(
-                        "Action: {} file will be removed",
+                        "[ACTION]: {} file will be removed",
                         dest_files
                             .file_name()
                             .unwrap()
@@ -115,7 +114,7 @@ impl SyncData {
         }
 
         self.remove_dest_file();
-        println!("Msg: Source and destination files are matched");
+        println!("[MSG]: Source and destination files are matched");
     }
 
     pub fn log_for_dest_modification(&self) {
@@ -142,19 +141,19 @@ impl SyncData {
         for src_file in list_src_files {
             for dest_file in &list_dest_files {
                 let src_file_content =
-                    read_to_string(&src_file).expect("Err: failed to read the file");
+                    read_to_string(&src_file).expect("[ERROR]: failed to read the file");
                 let dest_file_content =
-                    read_to_string(&dest_file).expect("Err: failed to read the file");
+                    read_to_string(&dest_file).expect("[ERROR]: failed to read the file");
 
                 print!("Source file content: \n{}", src_file_content);
                 print!("Destination file content: \n{}", dest_file_content);
 
                 if src_file_content != dest_file_content {
-                    println!("Status: Content not matched");
-                    println!("Success: Overwrite complete");
-                    self.overwrite_with_src(modified_dest_file.clone());
+                    println!("[STATUS]: content not matched");
+                    let _ = self.overwrite_with_src(modified_dest_file.clone());
+                    println!("[SUCCESS]: overwrite complete");
                 } else {
-                    println!("Msg: No overwrite needed. All files matched");
+                    println!("[MSG]: no overwrite needed because all files matched");
                 }
             }
         }
