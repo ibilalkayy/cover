@@ -646,7 +646,7 @@ fn test_overwrite_with_src() {
 
     let (modified_dest_file, dest_modified) = sync.dest_file_modified();
     if dest_modified {
-        let _ = sync.overwrite_with_src(modified_dest_file);
+        sync.overwrite_with_src(modified_dest_file);
     }
 
     let src_files = sync.list_source_files();
@@ -1555,7 +1555,7 @@ fn test_edge_overwrite_with_no_src() {
         read_to_string(&dest_file).expect("Err: failed to read destination file before overwrite");
 
     // Try to call overwrite (should not actually overwrite since no source file exists)
-    let _ = sync.overwrite_with_src(PathBuf::from("common.txt"));
+    sync.overwrite_with_src(PathBuf::from("common.txt"));
 
     // Read destination file content AFTER attempting overwrite
     let after_content =

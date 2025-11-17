@@ -1,7 +1,7 @@
 use super::sync::SyncData;
 use std::{
+    fs::copy,
     fs::remove_file,
-    fs::{copy, read_to_string},
     path::{Path, PathBuf},
 };
 
@@ -63,38 +63,20 @@ impl SyncData {
         }
     }
 
-    pub fn overwrite_with_src(&self, file_name: PathBuf) -> bool {
+    pub fn overwrite_with_src(&self, file_name: PathBuf) {
         let src_files = self.list_source_files();
         let dest_files = self.list_destination_files();
 
-        for src_file in src_files {
+        if src_files.len() != 0 {
             for dest_file in &dest_files {
-                let src_file_content =
-                    read_to_string(&src_file).expect("[ERROR]: failed to read the file");
-                let dest_file_content =
-                    read_to_string(&dest_file).expect("[ERROR]: failed to read the file");
+                remove_file(&dest_file).expect("[ERROR]: failed to remove the file");
 
-                let given_dest_file = file_name
-                    .file_name()
-                    .expect("[ERROR]: failed to get the file name");
-
-                let found_dest_file = dest_file
-                    .file_name()
-                    .expect("[ERROR]: failed to get the file name");
-
-                if given_dest_file == found_dest_file && src_file_content != dest_file_content {
-                    remove_file(&dest_file).expect("[ERROR]: failed to remove the file");
-
-                    let src_file = Path::new(&self.source).join(file_name.clone());
-                    copy(&src_file, &dest_file).expect("[ERROR]: failed to copy the file");
-
-                    return true;
-                } else {
-                    return false;
-                }
+                let src_file = Path::new(&self.source).join(&file_name);
+                copy(&src_file, &dest_file).expect("[ERROR]: failed to copy the file");
             }
+        } else {
+            eprintln!("[ERROR]: source file does not exist");
         }
-        false
     }
 
     pub fn remove_all_dest_files(&self) {

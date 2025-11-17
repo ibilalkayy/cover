@@ -55,12 +55,12 @@ impl SyncData {
 
     pub fn sync_output(&mut self) {
         if !self.src_dest_dir_present() {
-            eprintln!("[ERROR]: missing source or destination directories");
+            eprintln!("[ERROR]: source or destination directories missing");
             return;
         }
 
         if !self.single_command_selected() {
-            eprintln!("[ERROR]: entering multiple flags are not allowed");
+            eprintln!("[ERROR]: multiple flags are not allowed");
             return;
         }
 
@@ -91,13 +91,8 @@ impl SyncData {
                         println!("[MSG]: destination file(s) creation not allowed");
                     }
                     FileState::DestModified => {
-                        if self.overwrite_with_src(modified_dest_file) {
-                            eprintln!(
-                                "[MSG]: destination file(s) content has been overwritten with the source file(s) content"
-                            );
-                        } else {
-                            println!("[STATUS]: no changes detected");
-                        }
+                        self.overwrite_with_src(modified_dest_file);
+                        println!("[MSG]: destination overwritten with source");
                     }
                     FileState::NoChange => {
                         println!("[STATUS]: no changes detected");
@@ -106,7 +101,7 @@ impl SyncData {
             }
             FileAction::Delete => {
                 self.remove_all_dest_files();
-                println!("[SUCCESS]: Destination files are successfully deleted");
+                println!("[SUCCESS]: destination file(s) successfully deleted");
             }
             FileAction::DryRun => {
                 let src_created = self.src_file_created();
@@ -121,23 +116,23 @@ impl SyncData {
 
                 match state {
                     FileState::SrcCreated => {
-                        println!("[DRY RUN]: Would copy the source file(s) to destination");
+                        println!("[DRY RUN]: would copy the source file(s) to destination");
                     }
                     FileState::SrcModified => {
-                        println!("[DRY RUN]: Would update the destination file(s)");
+                        println!("[DRY RUN]: would update the destination file(s)");
                     }
                     FileState::DestCreated => {
                         println!(
-                            "[DRY RUN]: Would prevent the creation of the destination file(s)"
+                            "[DRY RUN]: would prevent the creation of the destination file(s)"
                         );
                     }
                     FileState::DestModified => {
                         println!(
-                            "[DRY RUN]: Would overwrite the destination file(s) with source file(s)"
+                            "[DRY RUN]: would overwrite the destination file(s) with source file(s)"
                         );
                     }
                     FileState::NoChange => {
-                        eprintln!("[DRY RUN]: Would give the error because no changes detected");
+                        eprintln!("[DRY RUN]: would give the error because no changes detected");
                     }
                 }
             }
