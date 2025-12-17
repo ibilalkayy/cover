@@ -8,3 +8,4 @@ readme.workspace = true
 categories.workspace = true
 
 [dependencies]
+walkdir.workspace = true

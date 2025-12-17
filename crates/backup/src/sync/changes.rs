@@ -1,124 +1,148 @@
 use super::sync::SyncData;
-use std::{
-    fs::{read_dir, read_to_string},
-    path::{Path, PathBuf},
-};
+use std::{fs::read_to_string, path::PathBuf};
 
 impl SyncData {
     pub fn src_file_created(&self) -> bool {
-        let src_entries = read_dir(&self.source).expect("[ERROR]: failed to read the source dir");
-        for entry in src_entries.flatten() {
-            let file_name = entry.file_name().to_string_lossy().to_string();
-            let dest_path = Path::new(&self.destination).join(&file_name);
-            if !dest_path.exists() {
-                return true;
+        let dir_path = self.list_src_dirs();
+        let file_path = self.list_src_files();
+        let mut not_found = false;
+
+        for entry in dir_path {
+            if entry == self.source {
+                continue;
+            }
+
+            let relative_dir = entry.strip_prefix(&self.source);
+            match relative_dir {
+                Ok(dir) => {
+                    let relative_path = self.destination.join(dir);
+                    if !relative_path.exists() {
+                        not_found = true;
+                    }
+                }
+                Err(e) => eprintln!("[ERROR]: {}", e),
             }
         }
-        false
+
+        for entry in file_path {
+            let relative_file = entry.strip_prefix(&self.source);
+            match relative_file {
+                Ok(file) => {
+                    let relative_path = self.destination.join(file);
+                    if !relative_path.exists() {
+                        not_found = true;
+                    }
+                }
+                Err(e) => eprintln!("[ERROR]: {}", e),
+            }
+        }
+        not_found
     }
 
-    pub fn src_file_modified(&self) -> (PathBuf, bool) {
-        let mut is_modified = false;
-        let mut modified_file = PathBuf::new();
-        let mut last_modify_numeric: Vec<f64> = Vec::new();
+    pub fn src_file_modified(&self) -> (Vec<PathBuf>, bool) {
+        let src_files = self.list_src_files();
+        let dest_files = self.list_dest_files();
 
-        let src_files = self.list_source_files();
-        let dest_files = self.list_destination_files();
+        let src_timestamp = self.file_timestamp(src_files, &self.source);
+        let dest_timestamp = self.file_timestamp(dest_files, &self.destination);
 
-        for src_file in src_files {
-            for dest_file in &dest_files {
-                let src_file_content =
-                    read_to_string(&src_file).expect("[ERROR]: failed to read the file");
-                let dest_file_content =
-                    read_to_string(&dest_file).expect("[ERROR]: failed to read the file");
+        let mut modified_files: Vec<PathBuf> = Vec::new();
 
-                let file_name = dest_file
-                    .file_name()
-                    .expect("[ERROR]: failed to get the file name");
+        for (path, src_time) in &src_timestamp {
+            let dest = dest_timestamp.get(path);
+            match dest {
+                Some(dest_time) => {
+                    if src_time > dest_time {
+                        let src_path = self.source.join(path);
+                        let dest_path = self.destination.join(path);
 
-                if let Some((src_time, dest_time)) =
-                    self.file_duration_since(&PathBuf::from(&file_name))
-                {
-                    if src_time > dest_time
-                        && dest_time != 0.0
-                        && src_file_content != dest_file_content
-                    {
-                        last_modify_numeric.push(src_time);
-                        if let Some(max_value) = last_modify_numeric
-                            .iter()
-                            .cloned()
-                            .fold(None, |max, val| Some(max.map_or(val, |m: f64| m.max(val))))
-                        {
-                            if max_value == src_time {
-                                modified_file = PathBuf::from(&file_name);
-                                is_modified = true;
-                            } else {
-                                break;
-                            }
+                        let src_content =
+                            read_to_string(src_path).expect("[ERROR]: failed to read the file");
+                        let dest_content =
+                            read_to_string(dest_path).expect("[ERROR]: failed to read the file");
+
+                        if src_content != dest_content {
+                            modified_files.push(path.clone());
                         }
                     }
                 }
+                None => {}
             }
         }
-        (modified_file, is_modified)
+
+        let file_modified = !modified_files.is_empty();
+        (modified_files, file_modified)
     }
 
     pub fn dest_file_created(&self) -> bool {
-        let dest_entries =
-            read_dir(&self.destination).expect("[ERROR]: failed to read destination dir");
-        for entry in dest_entries.flatten() {
-            let file_name = entry.file_name().to_string_lossy().to_string();
-            let src_path = Path::new(&self.source).join(&file_name);
-            if !src_path.exists() {
-                return true;
+        let dir_path = self.list_dest_dirs();
+        let file_path = self.list_dest_files();
+        let mut not_found = false;
+
+        for entry in dir_path {
+            if entry == self.destination {
+                continue;
+            }
+
+            let relative_dir = entry.strip_prefix(&self.destination);
+            match relative_dir {
+                Ok(dir) => {
+                    let relative_path = self.source.join(dir);
+                    if !relative_path.exists() {
+                        not_found = true;
+                    }
+                }
+                Err(e) => eprintln!("[ERROR]: {}", e),
             }
         }
-        false
+
+        for entry in file_path {
+            let relative_file = entry.strip_prefix(&self.destination);
+            match relative_file {
+                Ok(file) => {
+                    let relative_path = self.source.join(file);
+                    if !relative_path.exists() {
+                        not_found = true;
+                    }
+                }
+                Err(e) => eprintln!("[ERROR]: {}", e),
+            }
+        }
+        not_found
     }
 
-    pub fn dest_file_modified(&self) -> (PathBuf, bool) {
-        let mut is_modified = false;
-        let mut modified_file = PathBuf::new();
-        let mut last_modify_numeric: Vec<f64> = Vec::new();
+    pub fn dest_file_modified(&self) -> (Vec<PathBuf>, bool) {
+        let src_files = self.list_src_files();
+        let dest_files = self.list_dest_files();
 
-        let src_files = self.list_source_files();
-        let dest_files = self.list_destination_files();
+        let src_timestamp = self.file_timestamp(src_files, &self.source);
+        let dest_timestamp = self.file_timestamp(dest_files, &self.destination);
 
-        for src_file in src_files {
-            for dest_file in &dest_files {
-                let src_file_content =
-                    read_to_string(&src_file).expect("[ERROR]: failed to read the file");
-                let dest_file_content =
-                    read_to_string(&dest_file).expect("[ERROR]: failed to read the file");
+        let mut modified_files: Vec<PathBuf> = Vec::new();
 
-                let file_name = dest_file
-                    .file_name()
-                    .expect("[ERROR]: failed to get the file name");
+        for (path, dest_time) in &dest_timestamp {
+            let src = src_timestamp.get(path);
+            match src {
+                Some(src_time) => {
+                    if dest_time > src_time {
+                        let src_path = self.source.join(path);
+                        let dest_path = self.destination.join(path);
 
-                if let Some((src_time, dest_time)) =
-                    self.file_duration_since(&PathBuf::from(&file_name))
-                {
-                    if dest_time > src_time
-                        && src_time != 0.0
-                        && src_file_content != dest_file_content
-                    {
-                        last_modify_numeric.push(dest_time);
-                        if let Some(max_value) = last_modify_numeric
-                            .iter()
-                            .cloned()
-                            .fold(None, |max, val| Some(max.map_or(val, |m: f64| m.max(val))))
-                        {
-                            if max_value == dest_time {
-                                modified_file = PathBuf::from(&file_name);
-                                is_modified = true;
-                            } else {
-                                break;
-                            }
+                        let src_content =
+                            read_to_string(src_path).expect("[ERROR]: failed to read the file");
+                        let dest_content =
+                            read_to_string(dest_path).expect("[ERROR]: failed to read the file");
+
+                        if src_content != dest_content {
+                            modified_files.push(path.clone());
                         }
                     }
                 }
+                None => {}
             }
         }
-        (modified_file, is_modified)
+
+        let file_modified = !modified_files.is_empty();
+        (modified_files, file_modified)
     }
 }

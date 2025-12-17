@@ -79,7 +79,7 @@ impl SyncData {
 
                 match state {
                     FileState::SrcCreated => {
-                        self.copy_src_to_destination();
+                        self.copy_src_to_dest();
                         println!("[SUCCESS]: source file(s) successfully copied");
                     }
                     FileState::SrcModified => {
@@ -88,10 +88,10 @@ impl SyncData {
                     }
                     FileState::DestCreated => {
                         self.remove_dest_file();
-                        println!("[MSG]: destination file(s) creation not allowed");
+                        println!("[MSG]: creation of destination file(s) not allowed");
                     }
                     FileState::DestModified => {
-                        self.overwrite_with_src(modified_dest_file);
+                        self.update_dest_file(modified_dest_file);
                         println!("[MSG]: destination overwritten with source");
                     }
                     FileState::NoChange => {
@@ -141,7 +141,7 @@ impl SyncData {
                 let (modified_src_file, src_modified) = self.src_file_modified();
 
                 let dest_created = self.dest_file_created();
-                let (_, dest_modified) = self.dest_file_modified();
+                let (modified_dest_file, dest_modified) = self.dest_file_modified();
 
                 let mut condition: [bool; 4] =
                     [src_created, src_modified, dest_created, dest_modified];
@@ -149,16 +149,16 @@ impl SyncData {
 
                 match state {
                     FileState::SrcCreated => {
-                        self.log_for_source_creation();
+                        self.src_creation_log();
                     }
                     FileState::SrcModified => {
-                        self.log_for_source_modification(modified_src_file);
+                        self.src_modification_log(modified_src_file);
                     }
                     FileState::DestCreated => {
-                        self.log_for_dest_creation();
+                        self.dest_creation_log();
                     }
                     FileState::DestModified => {
-                        self.log_for_dest_modification();
+                        self.dest_modification_log(modified_dest_file);
                     }
                     FileState::NoChange => {
                         println!("[STATUS]: no changes detected");
