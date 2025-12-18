@@ -105,11 +105,24 @@ impl SyncData {
 
         let src: HashSet<PathBuf> = src_data.into_iter().collect();
         let dest: HashSet<PathBuf> = dest_data.into_iter().collect();
+        let mut combine_dir = Vec::new();
 
         for d in dest.difference(&src) {
             let dest_path = self.destination.join(d);
-            remove_dir(dest_path).expect("[ERROR]: failed to remove the directory");
+            let dest_len = dest_path.as_os_str().len();
+            combine_dir.push((dest_path, dest_len));
         }
+
+        let max_dir_val = combine_dir.iter().fold(None, |acc, item| match acc {
+            None => Some(item),
+            Some(current_max) => {
+                if item.1 > current_max.1 {
+                    Some(item)
+                } else {
+                    Some(current_max)
+                }
+            }
+        });
 
         // Files
         for entry in src_files {
@@ -132,10 +145,37 @@ impl SyncData {
 
         let src: HashSet<PathBuf> = source_data.into_iter().collect();
         let dest: HashSet<PathBuf> = destination_data.into_iter().collect();
+        let mut combine_file = Vec::new();
 
         for d in dest.difference(&src) {
             let dest_path = self.destination.join(d);
-            remove_file(dest_path).expect("[ERROR]: failed to remove the file");
+            let dest_len = dest_path.as_os_str().len();
+            combine_file.push((dest_path, dest_len));
+        }
+
+        let max_file_val = combine_file.iter().fold(None, |acc, item| match acc {
+            None => Some(item),
+            Some(current_max) => {
+                if item.1 > current_max.1 {
+                    Some(item)
+                } else {
+                    Some(current_max)
+                }
+            }
+        });
+
+        match max_file_val {
+            Some(file) => {
+                let dest_file = file.0.clone();
+                remove_file(dest_file).expect("[ERROR]: failed to remove the file");
+            }
+            None => {
+                let dest_dir = max_dir_val
+                    .expect("[ERROR]: failed to get the directory")
+                    .0
+                    .clone();
+                remove_dir(dest_dir).expect("[ERROR]: failed to remove the directory");
+            }
         }
     }
 
