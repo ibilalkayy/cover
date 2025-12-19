@@ -77,6 +77,11 @@ impl SyncData {
             return;
         }
 
+        if self.has_duplicates() {
+            eprintln!("[ERROR]: duplicate files and directories in the source are not allowed");
+            return;
+        }
+
         let action = self.to_action();
         match action {
             FileAction::ChangedOnly => {
