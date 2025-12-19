@@ -9,7 +9,7 @@ walkdir = "2.5.0"
 [workspace.package]
 edition = "2024"
 repository = "https://github.com/ibilalkayy/cover"
-version = "0.1.12"
+version = "0.1.13"
 license = "Apache-2.0"
 readme = "README.md"
 categories = ["command-line-utilities"]
