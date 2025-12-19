@@ -25,7 +25,7 @@ pub enum FileAction {
 }
 
 impl SyncData {
-    pub fn to_action(&self) -> FileAction {
+    fn to_action(&self) -> FileAction {
         if self.changed_only {
             FileAction::ChangedOnly
         } else if self.delete {
@@ -39,7 +39,7 @@ impl SyncData {
         }
     }
 
-    pub fn to_state(&self, condition: &mut [bool]) -> FileState {
+    fn to_state(&self, condition: &mut [bool]) -> FileState {
         if condition[0] {
             FileState::SrcCreated
         } else if condition[1] {
@@ -53,9 +53,22 @@ impl SyncData {
         }
     }
 
+    fn file_status(&self) -> (Vec<PathBuf>, Vec<PathBuf>, FileState) {
+        let src_created = self.src_file_created();
+        let (modified_src_file, src_modified) = self.src_file_modified();
+
+        let dest_created = self.dest_file_created();
+        let (modified_dest_file, dest_modified) = self.dest_file_modified();
+
+        let mut condition: [bool; 4] = [src_created, src_modified, dest_created, dest_modified];
+        let state = self.to_state(&mut condition);
+
+        (modified_src_file, modified_dest_file, state)
+    }
+
     pub fn sync_output(&mut self) {
         if !self.src_dest_dir_present() {
-            eprintln!("[ERROR]: source or destination directories missing");
+            eprintln!("[ERROR]: missing source or destination directories");
             return;
         }
 
@@ -67,32 +80,27 @@ impl SyncData {
         let action = self.to_action();
         match action {
             FileAction::ChangedOnly => {
-                let src_created = self.src_file_created();
-                let (modified_src_file, src_modified) = self.src_file_modified();
-
-                let dest_created = self.dest_file_created();
-                let (modified_dest_file, dest_modified) = self.dest_file_modified();
-
-                let mut condition: [bool; 4] =
-                    [src_created, src_modified, dest_created, dest_modified];
-                let state = self.to_state(&mut condition);
-
+                let (modified_src_file, modified_dest_file, state) = self.file_status();
                 match state {
                     FileState::SrcCreated => {
                         self.copy_src_to_dest();
-                        println!("[SUCCESS]: source file(s) successfully copied");
+                        println!("[SUCCESS]: successfully copied source file(s)");
                     }
                     FileState::SrcModified => {
                         self.update_dest_file(modified_src_file);
-                        println!("[SUCCESS]: destination file(s) successfully updated");
+                        println!("[SUCCESS]: successfully updated destination file(s)");
                     }
                     FileState::DestCreated => {
                         self.remove_dest_file();
-                        println!("[MSG]: creation of destination file(s) not allowed");
+                        println!(
+                            "[MSG]: File(s) removed. File creation is not allowed in the destination"
+                        );
                     }
                     FileState::DestModified => {
                         self.update_dest_file(modified_dest_file);
-                        println!("[MSG]: destination overwritten with source");
+                        println!(
+                            "[MSG]: File(s) overwritten. File modification is not allowed in the destination"
+                        );
                     }
                     FileState::NoChange => {
                         println!("[STATUS]: no changes detected");
@@ -101,19 +109,9 @@ impl SyncData {
             }
             FileAction::Delete => {
                 self.remove_all_dest_files();
-                println!("[SUCCESS]: destination file(s) successfully deleted");
             }
             FileAction::DryRun => {
-                let src_created = self.src_file_created();
-                let (_, src_modified) = self.src_file_modified();
-
-                let dest_created = self.dest_file_created();
-                let (_, dest_modified) = self.dest_file_modified();
-
-                let mut condition: [bool; 4] =
-                    [src_created, src_modified, dest_created, dest_modified];
-                let state = self.to_state(&mut condition);
-
+                let (_, _, state) = self.file_status();
                 match state {
                     FileState::SrcCreated => {
                         println!("[DRY RUN]: would copy the source file(s) to destination");
@@ -137,16 +135,7 @@ impl SyncData {
                 }
             }
             FileAction::Verbose => {
-                let src_created = self.src_file_created();
-                let (modified_src_file, src_modified) = self.src_file_modified();
-
-                let dest_created = self.dest_file_created();
-                let (modified_dest_file, dest_modified) = self.dest_file_modified();
-
-                let mut condition: [bool; 4] =
-                    [src_created, src_modified, dest_created, dest_modified];
-                let state = self.to_state(&mut condition);
-
+                let (modified_src_file, modified_dest_file, state) = self.file_status();
                 match state {
                     FileState::SrcCreated => {
                         self.src_creation_log();

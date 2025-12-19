@@ -182,19 +182,32 @@ impl SyncData {
     pub fn remove_all_dest_files(&self) {
         let dest_dirs = self.list_dest_dirs();
         let dest_files = self.list_dest_files();
+        let mut removed = false;
 
         for entry in dest_files {
             if entry == self.destination {
                 continue;
             }
-            remove_file(entry).expect("[ERROR]: failed to remove the file");
+            if entry.exists() {
+                removed = true;
+                remove_file(entry).expect("[ERROR]: failed to remove the file");
+            }
         }
 
-        for entry in dest_dirs {
-            if entry == self.destination {
+        for entry in dest_dirs.iter().rev() {
+            if *entry == self.destination {
                 continue;
             }
-            remove_dir(entry).expect("[ERROR]: failed to remove the directory");
+            if entry.exists() {
+                removed = true;
+                remove_dir(entry).expect("[ERROR]: failed to remove the directory");
+            }
+        }
+
+        if removed {
+            println!("[SUCCESS]: destination file(s) successfully deleted");
+        } else {
+            eprintln!("[MSG]: no files are present to be removed");
         }
     }
 }
