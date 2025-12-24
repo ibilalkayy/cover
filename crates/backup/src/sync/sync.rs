@@ -73,12 +73,14 @@ impl SyncData {
         }
 
         if !self.single_command_selected() {
-            eprintln!("[ERROR]: multiple flags are not allowed");
+            eprintln!(
+                "[ERROR]: no option or multiple options are selected. See 'cargo run sync --help'"
+            );
             return;
         }
 
         if self.has_duplicates() {
-            eprintln!("[ERROR]: duplicate files and directories in the source are not allowed");
+            eprintln!("[ERROR]: duplicate files and directories are not allowed");
             return;
         }
 
