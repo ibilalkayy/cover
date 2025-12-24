@@ -1,7 +1,7 @@
 use super::sync::SyncData;
 use std::{collections::BTreeSet, path::PathBuf};
 
-fn filter_src_dir(src_dirs: &Vec<PathBuf>, source: &PathBuf) -> Vec<PathBuf> {
+pub fn filter_src_dir(src_dirs: &Vec<PathBuf>, source: &PathBuf) -> Vec<PathBuf> {
     let mut list_src_dirs = Vec::new();
 
     for dirs in src_dirs {
@@ -17,7 +17,7 @@ fn filter_src_dir(src_dirs: &Vec<PathBuf>, source: &PathBuf) -> Vec<PathBuf> {
     list_src_dirs
 }
 
-fn filter_dest_dir(dest_dirs: &Vec<PathBuf>, destination: &PathBuf) -> Vec<PathBuf> {
+pub fn filter_dest_dir(dest_dirs: &Vec<PathBuf>, destination: &PathBuf) -> Vec<PathBuf> {
     let mut list_dest_dirs = Vec::new();
 
     for dirs in dest_dirs {
@@ -33,7 +33,7 @@ fn filter_dest_dir(dest_dirs: &Vec<PathBuf>, destination: &PathBuf) -> Vec<PathB
     list_dest_dirs
 }
 
-fn filter_src_file(src_files: &Vec<PathBuf>) -> Vec<PathBuf> {
+pub fn filter_src_file(src_files: &Vec<PathBuf>) -> Vec<PathBuf> {
     let mut list_src_files = Vec::new();
 
     for file in src_files {
@@ -46,7 +46,7 @@ fn filter_src_file(src_files: &Vec<PathBuf>) -> Vec<PathBuf> {
     list_src_files
 }
 
-fn filter_dest_file(dest_files: &Vec<PathBuf>) -> Vec<PathBuf> {
+pub fn filter_dest_file(dest_files: &Vec<PathBuf>) -> Vec<PathBuf> {
     let mut list_dest_files = Vec::new();
 
     for file in dest_files {
