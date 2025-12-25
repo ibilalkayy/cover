@@ -183,7 +183,7 @@ fn test_list_dest_files() {
     let dest_sub_file = dest_sub_dir.join("dest_test_file.txt");
 
     create_dir_all(&dest_parent_dir).expect("[ERROR]: failed to create a destination directory");
-    create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a source directory");
+    create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
     File::create(&dest_sub_file).expect("[ERROR]: failed to create a destination file");
 
     let sync = SyncData {
@@ -223,8 +223,8 @@ fn test_list_dest_dirs() {
     }
     let dest_sub_dir = dest_parent_dir.join("test_dir");
 
-    create_dir_all(&dest_parent_dir).expect("[ERROR]: failed to create a source directory");
-    create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a source directory");
+    create_dir_all(&dest_parent_dir).expect("[ERROR]: failed to create a destination directory");
+    create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
 
     let sync = SyncData {
         source: PathBuf::new(),
