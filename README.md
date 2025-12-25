@@ -1,7 +1,15 @@
-![Logo](logo.png)
+<p align="center">
+  <img src="logo.png" alt="Logo" width="200"/>
+</p>
 
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE) [![Rust](https://img.shields.io/badge/Rust-stable-orange)](https://www.rust-lang.org)
-
+<p align="center">
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License">
+  </a>
+  <a href="https://www.rust-lang.org">
+    <img src="https://img.shields.io/badge/Rust-stable-orange" alt="Rust">
+  </a>
+</p>
 
 ✨ If you would like to help spread the word of Cover, please consider starring the repo!
 
