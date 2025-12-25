@@ -8,6 +8,20 @@ use backup::{
 };
 use clap::Parser;
 
+/// This function handles all the commands of the Cover application.
+///
+/// The commands are: sync, archive, restore, schedule, list, and clean.
+///
+/// # Example
+///
+/// ```rust,no_run
+/// // Example of calling the function in main.rs
+/// use my_crate::handle_commands;
+///
+/// fn main() {
+///     handle_commands();
+/// }
+/// ```
 fn handle_commands() {
     let cover = Cover::parse();
     match cover.command {
@@ -19,7 +33,6 @@ fn handle_commands() {
                 delete: s.delete,
                 dry_run: s.dry_run,
                 verbose: s.verbose,
-                // hash: s.hash,
             };
             sync_data.sync_options();
         }
@@ -68,6 +81,7 @@ fn handle_commands() {
     }
 }
 
+/// This is the main function that handles all the commands
 fn main() {
     handle_commands();
 }

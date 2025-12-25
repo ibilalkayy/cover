@@ -1,7 +1,36 @@
 use super::sync::SyncData;
 use std::{fs::read_to_string, path::PathBuf};
 
+/// Implementation of the source and destination files that are created or modified.
 impl SyncData {
+    /// Checks whether the source file is created or not.
+    ///
+    /// Resturns:
+    /// - Boolean value as a creation sign
+    ///
+    /// Lists the source files and directories for checking the creation, finds the relative directories and files and joins them with the destination.
+    ///
+    /// Checks the existance of those files in the destination.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use my_crate::SyncData;
+    /// use std::path::PathBuf;
+    ///
+    /// let sync = SyncData {
+    ///     source: PathBuf::from("source_directory"),
+    ///     destination: PathBuf::new(),
+    ///     changed_only: true,
+    ///     delete: false,
+    ///     dry_run: false,
+    ///     verbose: false,
+    /// };
+    ///
+    /// let file_found = true;
+    /// let created = sync.src_file_created();
+    /// assert_eq!(created, file_found);
+    /// ```
     pub fn src_file_created(&self) -> bool {
         let dir_path = self.list_src_dirs();
         let file_path = self.list_src_files();
@@ -39,6 +68,37 @@ impl SyncData {
         not_found
     }
 
+    /// Checks whether the source file is modified or not.
+    ///
+    /// Returns:
+    /// - The vector pathbuf for modified files.
+    /// - Boolean value as modification sign.
+    ///
+    /// Lists the source and destination files, checks the timestamp, declares a variable for storage and get the source and destination timestamp.
+    /// Finds the largest timestamp and reads the content of files. Compares the content to check the modification.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use my_crate::SyncData;
+    /// use std::path::PathBuf;
+    ///
+    /// let sync = SyncData {
+    ///     source: PathBuf::from("source_directory"),
+    ///     destination: PathBuf::from("destination_directory"),
+    ///     changed_only: true,
+    ///     delete: false,
+    ///     dry_run: false,
+    ///     verbose: false,
+    /// };
+    ///
+    /// let modified_file = PathBuf::from("filename.txt");
+    /// let (file_modified, is_modified) = sync.src_file_modified();
+    /// for file in file_modified {
+    ///     assert_eq!(file.to_string_lossy(), modified_file.to_string_lossy());
+    /// }
+    /// assert!(is_modified);
+    /// ```
     pub fn src_file_modified(&self) -> (Vec<PathBuf>, bool) {
         let src_files = self.list_src_files();
         let dest_files = self.list_dest_files();
@@ -74,6 +134,34 @@ impl SyncData {
         (modified_files, file_modified)
     }
 
+    /// Checks whether the destination file is created or not.
+    ///
+    /// Resturns:
+    /// - Boolean value as a creation sign
+    ///
+    /// Lists the source files and directories for checking creation, finds the relative directories and files and joins them with the source.
+    ///
+    /// Checks the existance of those files in the source.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use my_crate::SyncData;
+    /// use std::path::PathBuf;
+    ///
+    /// let sync = SyncData {
+    ///     source: PathBuf::new(),
+    ///     destination: PathBuf::from("destination_directory"),
+    ///     changed_only: true,
+    ///     delete: false,
+    ///     dry_run: false,
+    ///     verbose: false,
+    /// };
+    ///
+    /// let file_found = true;
+    /// let created = sync.dest_file_created();
+    /// assert_eq!(created, file_found);
+    /// ```
     pub fn dest_file_created(&self) -> bool {
         let dir_path = self.list_dest_dirs();
         let file_path = self.list_dest_files();
@@ -111,6 +199,37 @@ impl SyncData {
         not_found
     }
 
+    /// Checks whether the destination file is modified or not.
+    ///
+    /// Returns:
+    /// - The vector pathbuf for modified files.
+    /// - Boolean value as modification sign.
+    ///
+    /// Lists the source and destination files, checks the timestamp, declares a variable for storage and get the source and destination timestamp.
+    /// Finds the largest timestamp and reads the content of files. Compares the content to check the modification.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use my_crate::SyncData;
+    /// use std::path::PathBuf;
+    ///
+    /// let sync = SyncData {
+    ///     source: PathBuf::from("source_directory"),
+    ///     destination: PathBuf::from("destination_directory"),
+    ///     changed_only: true,
+    ///     delete: false,
+    ///     dry_run: false,
+    ///     verbose: false,
+    /// };
+    ///
+    /// let modified_file = PathBuf::from("filename.txt");
+    /// let (file_modified, is_modified) = sync.dest_file_modified();
+    /// for file in file_modified {
+    ///     assert_eq!(file.to_string_lossy(), modified_file.to_string_lossy());
+    /// }
+    /// assert!(is_modified);
+    /// ```
     pub fn dest_file_modified(&self) -> (Vec<PathBuf>, bool) {
         let src_files = self.list_src_files();
         let dest_files = self.list_dest_files();

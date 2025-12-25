@@ -1,7 +1,26 @@
+use clap::Parser;
 use std::path::PathBuf;
 
-use clap::Parser;
-
+/// Configuration options for the `sync` command
+///
+/// Holds the flags where two of them, source and destination are mandatory
+/// and the remaining ones are optional but one is atleast required
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use my_crate::SyncData;
+/// use std::path::PathBuf;
+///
+/// let sync = SyncData {
+///     source: PathBuf::from("source_directory"),
+///     destination: PathBuf::from("destination_directory"),
+///     changed_only: true,
+///     delete: false,
+///     dry_run: false,
+///     verbose: false,
+/// }
+/// ```
 #[derive(Debug, Parser)]
 pub struct SyncData {
     /// Source folder to take the file from
@@ -27,7 +46,4 @@ pub struct SyncData {
     /// Show detailed logs
     #[clap(long)]
     pub verbose: bool,
-    // /// Check file hashes instead of timestamps
-    // #[clap(long)]
-    // pub hash: bool,
 }

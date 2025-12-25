@@ -1,16 +1,16 @@
 pub struct ArchiveData {
-    pub zip: Option<bool>,
-    pub tar: Option<bool>,
-    pub encrypt: Option<bool>,
-    pub timestamp: Option<bool>,
+    pub zip: bool,
+    pub tar: bool,
+    pub encrypt: bool,
+    pub timestamp: bool,
 }
 
 impl ArchiveData {
     pub fn archive_output(&self) {
-        println!("{}", self.zip.unwrap());
-        println!("{}", self.tar.unwrap());
-        println!("{}", self.encrypt.unwrap());
-        println!("{}", self.timestamp.unwrap());
+        println!("{}", self.zip);
+        println!("{}", self.tar);
+        println!("{}", self.encrypt);
+        println!("{}", self.timestamp);
     }
 
     pub fn archive_options(&self) {
