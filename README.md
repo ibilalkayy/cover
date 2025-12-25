@@ -1,26 +1,67 @@
-# Cover
+![Logo](logo.png)
 
-A fast and reliable Rust-powered command-line tool for syncing, archiving, restoring, and scheduling backups with ease.
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE) [![Rust](https://img.shields.io/badge/Rust-stable-orange)](https://www.rust-lang.org)
 
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Rust](https://img.shields.io/badge/Rust-stable-orange)](https://www.rust-lang.org)
 
----
+✨ If you would like to help spread the word of Cover, please consider starring the repo!
 
-## ✨ Features
+# Table of Content
 
-- 🔄 **Sync** files and folders with incremental updates
-- 📦 **Archive** projects into `.zip` or `.tar.gz` (optional encryption & timestamps)
-- ♻️ **Restore** from backups easily
-- ⏰ **Schedule** automatic backups (daily, weekly, interval-based)
-- 📋 **List** archives and scheduled jobs
-- 🧹 **Clean** old backups with rules (`--keep-last`, `--older-than`)
+- [What is Cover?](#what-is-cover)
+- [Features](#features)
+  - [Present Features](#present-features)
+  - [Upcoming Features](#upcoming-features)
+- [Get Started](#get-started)
+- [Installation](#installation)
+- [License](#license)
+- [Contributing](#contributing)
 
----
+# What is Cover?
 
-## 🚀 Installation
+Cover is a Rust application where the source and destination are synced and any change in the source will be happening in the destination at the same time.
 
-Clone and build from source:
+## Features
+
+### Present Features
+
+- **Sync** files and folders of source with destination
+
+### Upcoming Features
+
+- **Archive** projects into `.zip` or `.tar.gz`
+- **Restore** from backups easily
+- **Schedule** automatic backups (daily, weekly, interval-based)
+- **List** archives and scheduled jobs
+- **Clean** old backups with rules (`--keep-last`, `--older-than`)
+
+## Get Started
+
+```bash
+cargo add cover
+```
+
+```bash
+cover sync
+cover archive
+cover restore
+cover schedule
+cover list
+cover clean
+cover help
+```
+
+```bash
+cover sync --source src_directory --destination dest_directory --changed-only
+cover sync --source src_directory --destination dest_directory --delete
+cover sync --source src_directory --destination dest_directory --dry-run
+cover sync --source src_directory --destination dest_directory --verbose
+```
+
+**Note:** Other commands are in the process.
+
+## Installation
+
+Fork, clone and build from the source:
 
 ```bash
 git clone https://github.com/ibilalkayy/cover.git
@@ -40,13 +81,10 @@ Optionally, move it to your `$PATH`:
 cp target/release/cover /usr/local/bin/cover
 ```
 
-## 🛡 License
+## License
 
 This project is licensed under the [Apache-2.0 License](LICENSE).
 
----
+## Contributing
 
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome!
-Feel free to open a PR or file an issue on [GitHub](https://github.com/ibilalkayy/cover/issues).
+Contributions, issues, and feature requests are welcome! Feel free to open a PR or file an issue on [GitHub](https://github.com/ibilalkayy/cover/issues).
