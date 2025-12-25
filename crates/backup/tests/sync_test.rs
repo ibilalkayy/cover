@@ -99,7 +99,7 @@ fn test_list_src_files() {
     let src_sub_file = src_sub_dir.join("test_src_file.txt");
 
     create_dir_all(&src_parent_dir).expect("[ERROR]: failed to create a source directory");
-    create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a directory");
+    create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
     File::create(&src_sub_file).expect("[ERROR]: failed to create a source file");
 
     let sync = SyncData {
@@ -140,7 +140,7 @@ fn test_list_src_dirs() {
     let src_sub_dir = src_parent_dir.join("test_dir");
 
     create_dir_all(&src_parent_dir).expect("[ERROR]: failed to create a source directory");
-    create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a directory");
+    create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
 
     let sync = SyncData {
         source: src_parent_dir.clone(),
@@ -183,7 +183,7 @@ fn test_list_dest_files() {
     let dest_sub_file = dest_sub_dir.join("dest_test_file.txt");
 
     create_dir_all(&dest_parent_dir).expect("[ERROR]: failed to create a destination directory");
-    create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a directory");
+    create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a source directory");
     File::create(&dest_sub_file).expect("[ERROR]: failed to create a destination file");
 
     let sync = SyncData {
@@ -224,7 +224,7 @@ fn test_list_dest_dirs() {
     let dest_sub_dir = dest_parent_dir.join("test_dir");
 
     create_dir_all(&dest_parent_dir).expect("[ERROR]: failed to create a source directory");
-    create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a directory");
+    create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a source directory");
 
     let sync = SyncData {
         source: PathBuf::new(),
@@ -279,7 +279,7 @@ fn test_file_timestamp() {
     create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
     create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
     File::create(&src_sub_file).expect("[ERROR]: failed to create a source file");
-    File::create(&dest_sub_file).expect("[ERROR]: failed to create a source file");
+    File::create(&dest_sub_file).expect("[ERROR]: failed to create a destination file");
 
     let sync = SyncData {
         source: src_parent_dir.clone(),
@@ -384,7 +384,7 @@ fn test_src_file_modified() {
     create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
     create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
     File::create(&src_sub_file).expect("[ERROR]: failed to create a source file");
-    File::create(&dest_sub_file).expect("[ERROR]: failed to create a source file");
+    File::create(&dest_sub_file).expect("[ERROR]: failed to create a destination file");
 
     write(&dest_sub_file, "original content").expect("[ERROR]: failed to write the file");
     thread::sleep(time::Duration::from_secs(1));
@@ -404,8 +404,10 @@ fn test_src_file_modified() {
         .map(|f| f.as_secs() as f64)
         .unwrap_or(0.0);
 
-    let src_content = read_to_string(&src_sub_file).expect("[ERROR]: failed to read the file");
-    let dest_content = read_to_string(&dest_sub_file).expect("[ERROR]: failed to read the file");
+    let src_content =
+        read_to_string(&src_sub_file).expect("[ERROR]: failed to read the source file");
+    let dest_content =
+        read_to_string(&dest_sub_file).expect("[ERROR]: failed to read the destination file");
 
     let src_file = src_sub_file
         .strip_prefix(&src_parent_dir)
@@ -453,7 +455,7 @@ fn test_dest_file_created() {
 
     create_dir_all(&dest_parent_dir).expect("[ERROR]: failed to create a source directory");
     create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
-    File::create(&dest_sub_file).expect("[ERROR]: failed to create a source file");
+    File::create(&dest_sub_file).expect("[ERROR]: failed to create a destination file");
 
     let mut file_found = false;
     for entry in WalkDir::new(&dest_parent_dir) {
@@ -509,11 +511,12 @@ fn test_dest_file_modified() {
     create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
     create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
     File::create(&src_sub_file).expect("[ERROR]: failed to create a source file");
-    File::create(&dest_sub_file).expect("[ERROR]: failed to create a source file");
+    File::create(&dest_sub_file).expect("[ERROR]: failed to create a destination file");
 
-    write(&src_sub_file, "original content").expect("[ERROR]: failed to write the file");
+    write(&src_sub_file, "original content").expect("[ERROR]: failed to write the source file");
     thread::sleep(time::Duration::from_secs(1));
-    write(&dest_sub_file, "modification content").expect("[ERROR]: failed to write the file");
+    write(&dest_sub_file, "modification content")
+        .expect("[ERROR]: failed to write the destination file");
 
     let src_num = metadata(&src_sub_file)
         .ok()
@@ -529,8 +532,10 @@ fn test_dest_file_modified() {
         .map(|f| f.as_secs() as f64)
         .unwrap_or(0.0);
 
-    let src_content = read_to_string(&src_sub_file).expect("[ERROR]: failed to read the file");
-    let dest_content = read_to_string(&dest_sub_file).expect("[ERROR]: failed to read the file");
+    let src_content =
+        read_to_string(&src_sub_file).expect("[ERROR]: failed to read the source file");
+    let dest_content =
+        read_to_string(&dest_sub_file).expect("[ERROR]: failed to read the destination file");
 
     let dest_file = dest_sub_file
         .strip_prefix(&dest_parent_dir)
@@ -651,7 +656,7 @@ fn test_remove_dest_files() {
     create_dir_all(&dest_parent_dir).expect("[ERROR]: failed to create a destination directory");
     create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
     create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
-    File::create(&dest_sub_file).expect("[ERROR]: failed to create a source file");
+    File::create(&dest_sub_file).expect("[ERROR]: failed to create a destination file");
     write(&dest_sub_file, "original content").expect("[ERROR]: failed to write the file");
 
     let sync = SyncData {
@@ -720,7 +725,7 @@ fn test_update_dest_file() {
     create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
     create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
     File::create(&src_sub_file).expect("[ERROR]: failed to create a source file");
-    File::create(&dest_sub_file).expect("[ERROR]: failed to create a source file");
+    File::create(&dest_sub_file).expect("[ERROR]: failed to create a destination file");
 
     write(&dest_sub_file, "destination content").expect("[ERROR]: failed to write the file");
     thread::sleep(time::Duration::from_secs(1));
@@ -745,8 +750,10 @@ fn test_update_dest_file() {
 
     for src_file in src_files {
         for dest_file in &dest_files {
-            src_content = read_to_string(&src_file).expect("[ERROR]: failed to read the file");
-            dest_content = read_to_string(&dest_file).expect("[ERROR]: failed to read the file");
+            src_content =
+                read_to_string(&src_file).expect("[ERROR]: failed to read the source file");
+            dest_content =
+                read_to_string(&dest_file).expect("[ERROR]: failed to read the destination file");
         }
     }
     assert_eq!(src_content, dest_content);
@@ -773,7 +780,7 @@ fn test_remove_all_dest_files() {
 
     create_dir_all(&dest_parent_dir).expect("[ERROR]: failed to create a destination directory");
     create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
-    File::create(&dest_sub_file).expect("[ERROR]: failed to create a source file");
+    File::create(&dest_sub_file).expect("[ERROR]: failed to create a destination file");
     write(&dest_sub_file, "destination content").expect("[ERROR]: failed to write the file");
 
     let sync = SyncData {
@@ -802,6 +809,217 @@ fn test_remove_all_dest_files() {
     remove_dir_all(&dest_parent_dir).ok();
 }
 
+#[test]
+fn src_files_present_or_not() {
+    let home_dir = env::var("HOME").expect("[ERROR]: failed to get the home directory");
+    let src_parent_dir = PathBuf::from(&home_dir).join("tmpsrc_file_present");
+
+    if src_parent_dir.exists() {
+        remove_dir_all(&src_parent_dir).ok();
+    }
+
+    let src_sub_dir = src_parent_dir.join("test_dir");
+    let src_sub_file = src_sub_dir.join("common.txt");
+
+    create_dir_all(&src_parent_dir).expect("[ERROR]: failed to create a source directory");
+    create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
+    File::create(&src_sub_file).expect("[ERROR]: failed to create a source file");
+
+    let sync = SyncData {
+        source: src_parent_dir.clone(),
+        destination: PathBuf::new(),
+        changed_only: true,
+        delete: false,
+        verbose: false,
+        dry_run: false,
+    };
+
+    let (dir_list, file_list) = sync.get_file_names();
+    assert!(dir_list.len() != 0 && file_list.len() != 0);
+
+    remove_file(&src_sub_file).ok();
+    remove_dir_all(&src_sub_dir).ok();
+    remove_dir_all(&src_parent_dir).ok();
+}
+
+#[test]
+fn test_has_duplicates() {
+    let home_dir = env::var("HOME").expect("[ERROR]: failed to get the home directory");
+    let src_parent_dir = PathBuf::from(&home_dir).join("tmpsrc_has_duplicates");
+
+    if src_parent_dir.exists() {
+        remove_dir_all(&src_parent_dir).ok();
+    }
+
+    let src_sub_dir = src_parent_dir.join("test_dir");
+    let src_sub_file1 = src_parent_dir.join("common.txt");
+    let src_sub_file2 = src_sub_dir.join("common.txt");
+
+    create_dir_all(&src_parent_dir).expect("[ERROR]: failed to create a source directory");
+    create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
+    File::create(&src_sub_file1).expect("[ERROR]: failed to create a source file");
+    File::create(&src_sub_file2).expect("[ERROR]: failed to create a source file");
+
+    let sync = SyncData {
+        source: src_parent_dir.clone(),
+        destination: PathBuf::new(),
+        changed_only: true,
+        delete: false,
+        verbose: false,
+        dry_run: false,
+    };
+
+    let result = sync.has_duplicates();
+    assert!(result == true);
+
+    remove_file(&src_sub_file1).ok();
+    remove_file(&src_sub_file2).ok();
+    remove_dir_all(&src_sub_dir).ok();
+    remove_dir_all(&src_parent_dir).ok();
+}
+
+#[test]
+fn test_filter_src_dirs() {
+    let home_dir = env::var("HOME").expect("[ERROR]: failed to get the home directory");
+    let src_parent_dir = PathBuf::from(&home_dir).join("tmpsrc_filter_dir");
+
+    if src_parent_dir.exists() {
+        remove_dir_all(&src_parent_dir).ok();
+    }
+
+    let src_sub_dir = src_parent_dir.join("test_dir");
+
+    create_dir_all(&src_parent_dir).expect("[ERROR]: failed to create a source directory");
+    create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
+
+    let sync = SyncData {
+        source: src_parent_dir.clone(),
+        destination: PathBuf::new(),
+        changed_only: true,
+        delete: false,
+        verbose: false,
+        dry_run: false,
+    };
+
+    let list_dirs = sync.list_src_dirs();
+    let filtered = filter_src_dir(&list_dirs, &sync.source);
+    let dir = src_sub_dir
+        .iter()
+        .last()
+        .expect("[ERROR]: failed to get the lastname")
+        .to_string_lossy()
+        .to_string();
+
+    assert!(filtered.len() != 0 && !dir.is_empty());
+    assert_eq!(filtered[0], PathBuf::from(dir));
+}
+
+#[test]
+fn test_filter_dest_dirs() {
+    let home_dir = env::var("HOME").expect("[ERROR]: failed to get the home directory");
+    let dest_parent_dir = PathBuf::from(&home_dir).join("tmpdest_filter_dir");
+
+    if dest_parent_dir.exists() {
+        remove_dir_all(&dest_parent_dir).ok();
+    }
+
+    let dest_sub_dir = dest_parent_dir.join("test_dir");
+
+    create_dir_all(&dest_parent_dir).expect("[ERROR]: failed to create a destination directory");
+    create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
+
+    let sync = SyncData {
+        source: PathBuf::new(),
+        destination: dest_parent_dir.clone(),
+        changed_only: true,
+        delete: false,
+        verbose: false,
+        dry_run: false,
+    };
+
+    let list_dirs = sync.list_dest_dirs();
+    let filtered = filter_dest_dir(&list_dirs, &sync.destination);
+    let dir = dest_sub_dir
+        .iter()
+        .last()
+        .expect("[ERROR]: failed to get the lastname")
+        .to_string_lossy()
+        .to_string();
+
+    assert!(filtered.len() != 0 && !dir.is_empty());
+    assert_eq!(filtered[0], PathBuf::from(dir));
+}
+
+#[test]
+fn test_filter_src_files() {
+    let home_dir = env::var("HOME").expect("[ERROR]: failed to get the home directory");
+    let src_parent_dir = PathBuf::from(&home_dir).join("tmpsrc_filter_file");
+
+    if src_parent_dir.exists() {
+        remove_dir_all(&src_parent_dir).ok();
+    }
+
+    let src_sub_dir = src_parent_dir.join("test_dir");
+    let src_sub_file = src_sub_dir.join("common.txt");
+
+    create_dir_all(&src_parent_dir).expect("[ERROR]: failed to create a source directory");
+    create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
+    File::create(&src_sub_file).expect("[ERROR]: failed to create a source file");
+
+    let sync = SyncData {
+        source: src_parent_dir.clone(),
+        destination: PathBuf::new(),
+        changed_only: true,
+        delete: false,
+        verbose: false,
+        dry_run: false,
+    };
+
+    let list_files = sync.list_src_files();
+    let filtered = filter_src_file(&list_files);
+    let file = src_sub_file
+        .file_name()
+        .expect("[ERROR]: failed to get the filename");
+
+    assert!(filtered.len() != 0 && !file.is_empty());
+    assert_eq!(filtered[0], PathBuf::from(file));
+}
+
+#[test]
+fn test_filter_dest_files() {
+    let home_dir = env::var("HOME").expect("[ERROR]: failed to get the home directory");
+    let dest_parent_dir = PathBuf::from(&home_dir).join("tmpdest_filter_file");
+
+    if dest_parent_dir.exists() {
+        remove_dir_all(&dest_parent_dir).ok();
+    }
+
+    let dest_sub_dir = dest_parent_dir.join("test_dir");
+    let dest_sub_file = dest_sub_dir.join("common.txt");
+
+    create_dir_all(&dest_parent_dir).expect("[ERROR]: failed to create a destination directory");
+    create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
+    File::create(&dest_sub_file).expect("[ERROR]: failed to create a destination file");
+
+    let sync = SyncData {
+        source: PathBuf::new(),
+        destination: dest_parent_dir.clone(),
+        changed_only: true,
+        delete: false,
+        verbose: false,
+        dry_run: false,
+    };
+
+    let list_files = sync.list_dest_files();
+    let filtered = filter_dest_file(&list_files);
+    let file = dest_sub_file
+        .file_name()
+        .expect("[ERROR]: failed to get the filename");
+
+    assert!(filtered.len() != 0 && !file.is_empty());
+    assert_eq!(filtered[0], PathBuf::from(file));
+}
+
 // ----------------------------------------------- Edge Case ------------------------------------------------
 
 #[test]
@@ -813,7 +1031,7 @@ fn test_src_dir_present() {
         remove_dir_all(&src_parent_dir).ok();
     }
 
-    create_dir_all(&src_parent_dir).expect("[ERROR]: failed to create a destination directory");
+    create_dir_all(&src_parent_dir).expect("[ERROR]: failed to create a source directory");
 
     let sync = SyncData {
         source: src_parent_dir.clone(),
@@ -968,7 +1186,7 @@ fn test_source_empty() {
         dry_run: false,
     };
 
-    let entries = read_dir(&src_parent_dir).expect("[ERROR]: failed to read the directory");
+    let entries = read_dir(&src_parent_dir).expect("[ERROR]: failed to read the source directory");
     let searched_files: Vec<PathBuf> = entries.filter_map(|f| f.ok()).map(|f| f.path()).collect();
 
     let src_files = sync.list_src_files();
@@ -1005,7 +1223,7 @@ fn test_dest_empty() {
         remove_dir_all(&dest_parent_dir).ok();
     }
 
-    create_dir_all(&dest_parent_dir).expect("[ERROR]: failed to create a source directory");
+    create_dir_all(&dest_parent_dir).expect("[ERROR]: failed to create a destination directory");
 
     let sync = SyncData {
         source: PathBuf::new(),
@@ -1129,7 +1347,7 @@ fn test_src_timestamp_greater_than_dest() {
     create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
     create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
     File::create(&src_sub_file).expect("[ERROR]: failed to create a source file");
-    File::create(&dest_sub_file).expect("[ERROR]: failed to create a source file");
+    File::create(&dest_sub_file).expect("[ERROR]: failed to create a destination file");
 
     write(&dest_sub_file, "destination content").expect("[ERROR]: failed to write the file");
     thread::sleep(time::Duration::from_secs(1));
@@ -1193,7 +1411,7 @@ fn test_dest_timestamp_greater_than_src() {
     create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
     create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
     File::create(&src_sub_file).expect("[ERROR]: failed to create a source file");
-    File::create(&dest_sub_file).expect("[ERROR]: failed to create a source file");
+    File::create(&dest_sub_file).expect("[ERROR]: failed to create a destination file");
 
     write(&src_sub_file, "source content").expect("[ERROR]: failed to write the file");
     thread::sleep(time::Duration::from_secs(1));
@@ -1257,7 +1475,7 @@ fn test_src_timestamp_equal_to_dest() {
     create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
     create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
     File::create(&src_sub_file).expect("[ERROR]: failed to create a source file");
-    File::create(&dest_sub_file).expect("[ERROR]: failed to create a source file");
+    File::create(&dest_sub_file).expect("[ERROR]: failed to create a destination file");
 
     write(&src_sub_file, "source content").expect("[ERROR]: failed to write the file");
     write(&dest_sub_file, "destination content").expect("[ERROR]: failed to write the file");
@@ -1349,7 +1567,7 @@ fn test_src_file_not_modified() {
     create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
     create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
     File::create(&src_sub_file).expect("[ERROR]: failed to create a source file");
-    File::create(&dest_sub_file).expect("[ERROR]: failed to create a source file");
+    File::create(&dest_sub_file).expect("[ERROR]: failed to create a destination file");
     thread::sleep(std::time::Duration::from_secs(1));
     write(&dest_sub_file, "destination content").expect("[ERROR]: failed to write the file");
 
@@ -1367,8 +1585,10 @@ fn test_src_file_not_modified() {
         .map(|f| f.as_secs() as f64)
         .unwrap_or(0.0);
 
-    let src_content = read_to_string(&src_sub_file).expect("[ERROR]: failed to read the file");
-    let dest_content = read_to_string(&dest_sub_file).expect("[ERROR]: failed to read the file");
+    let src_content =
+        read_to_string(&src_sub_file).expect("[ERROR]: failed to read the source file");
+    let dest_content =
+        read_to_string(&dest_sub_file).expect("[ERROR]: failed to read the destination file");
 
     let dest_file = dest_sub_file
         .strip_prefix(&dest_parent_dir)
@@ -1411,7 +1631,7 @@ fn test_dest_file_not_created() {
     if dest_parent_dir.exists() {
         remove_dir_all(&dest_parent_dir).ok();
     }
-    create_dir_all(&dest_parent_dir).expect("[ERROR]: failed to create a source directory");
+    create_dir_all(&dest_parent_dir).expect("[ERROR]: failed to create a destination directory");
 
     let sync = SyncData {
         source: PathBuf::new(),
@@ -1535,7 +1755,7 @@ fn test_dest_files_not_removed() {
     create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
     create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
     File::create(&src_sub_file).expect("[ERROR]: failed to create a source file");
-    File::create(&dest_sub_file).expect("[ERROR]: failed to create a source file");
+    File::create(&dest_sub_file).expect("[ERROR]: failed to create a destination file");
     write(&src_sub_file, "source content").expect("[ERROR]: failed to write the file");
     write(&dest_sub_file, "destination content").expect("[ERROR]: failed to write the file");
 
@@ -1616,7 +1836,7 @@ fn test_dest_files_not_removed() {
 }
 
 #[test]
-fn test_dest_file_not_update() {
+fn test_dest_file_not_updated() {
     let home_dir = env::var("HOME").expect("[ERROR]: failed to get the home directory");
     let src_parent_dir = PathBuf::from(&home_dir).join("tmpsrc_not_update");
     let dest_parent_dir = PathBuf::from(&home_dir).join("tmpdest_not_update");
@@ -1640,7 +1860,7 @@ fn test_dest_file_not_update() {
     create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
     create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
     File::create(&src_sub_file).expect("[ERROR]: failed to create a source file");
-    File::create(&dest_sub_file).expect("[ERROR]: failed to create a source file");
+    File::create(&dest_sub_file).expect("[ERROR]: failed to create a destination file");
     write(&dest_sub_file, "destination content").expect("[ERROR]: failed to write the file");
     thread::sleep(time::Duration::from_secs(1));
     write(&src_sub_file, "source content").expect("[ERROR]: failed to write the file");
@@ -1662,8 +1882,10 @@ fn test_dest_file_not_update() {
 
     for src_file in src_files {
         for dest_file in &dest_files {
-            src_content = read_to_string(&src_file).expect("[ERROR]: failed to read the file");
-            dest_content = read_to_string(&dest_file).expect("[ERROR]: failed to read the file");
+            src_content =
+                read_to_string(&src_file).expect("[ERROR]: failed to read the source file");
+            dest_content =
+                read_to_string(&dest_file).expect("[ERROR]: failed to read the destination file");
         }
     }
 
@@ -1718,7 +1940,7 @@ fn test_no_dest_file() {
 
     let mut src_content = String::new();
     for src_file in src_files {
-        src_content = read_to_string(&src_file).expect("[ERROR]: failed to read the file");
+        src_content = read_to_string(&src_file).expect("[ERROR]: failed to read the source file");
     }
 
     assert!(!src_content.is_empty() && dest_files.is_empty());
@@ -1769,7 +1991,8 @@ fn test_no_src_file() {
 
     let mut dest_content = String::new();
     for dest_file in dest_files {
-        dest_content = read_to_string(&dest_file).expect("[ERROR]: failed to read the file");
+        dest_content =
+            read_to_string(&dest_file).expect("[ERROR]: failed to read the destination file");
     }
 
     assert!(!dest_content.is_empty() && src_files.is_empty());
@@ -1777,215 +2000,4 @@ fn test_no_src_file() {
     remove_file(&dest_sub_file).ok();
     remove_dir_all(&src_parent_dir).ok();
     remove_dir_all(&dest_parent_dir).ok();
-}
-
-#[test]
-fn src_files_present_or_not() {
-    let home_dir = env::var("HOME").expect("[ERROR]: failed to get the home directory");
-    let src_parent_dir = PathBuf::from(&home_dir).join("tmpsrc_file_present");
-
-    if src_parent_dir.exists() {
-        remove_dir_all(&src_parent_dir).ok();
-    }
-
-    let src_sub_dir = src_parent_dir.join("test_dir");
-    let src_sub_file = src_sub_dir.join("common.txt");
-
-    create_dir_all(&src_parent_dir).expect("[ERROR]: failed to create a source directory");
-    create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
-    File::create(&src_sub_file).expect("[ERROR]: failed to create a destination file");
-
-    let sync = SyncData {
-        source: src_parent_dir.clone(),
-        destination: PathBuf::new(),
-        changed_only: true,
-        delete: false,
-        verbose: false,
-        dry_run: false,
-    };
-
-    let (dir_list, file_list) = sync.get_file_names();
-    assert!(dir_list.len() != 0 && file_list.len() != 0);
-
-    remove_file(&src_sub_file).ok();
-    remove_dir_all(&src_sub_dir).ok();
-    remove_dir_all(&src_parent_dir).ok();
-}
-
-#[test]
-fn test_has_duplicates() {
-    let home_dir = env::var("HOME").expect("[ERROR]: failed to get the home directory");
-    let src_parent_dir = PathBuf::from(&home_dir).join("tmpsrc_has_duplicates");
-
-    if src_parent_dir.exists() {
-        remove_dir_all(&src_parent_dir).ok();
-    }
-
-    let src_sub_dir = src_parent_dir.join("test_dir");
-    let src_sub_file1 = src_parent_dir.join("common.txt");
-    let src_sub_file2 = src_sub_dir.join("common.txt");
-
-    create_dir_all(&src_parent_dir).expect("[ERROR]: failed to create a source directory");
-    create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
-    File::create(&src_sub_file1).expect("[ERROR]: failed to create a file");
-    File::create(&src_sub_file2).expect("[ERROR]: failed to create a file");
-
-    let sync = SyncData {
-        source: src_parent_dir.clone(),
-        destination: PathBuf::new(),
-        changed_only: true,
-        delete: false,
-        verbose: false,
-        dry_run: false,
-    };
-
-    let result = sync.has_duplicates();
-    assert!(result == true);
-
-    remove_file(&src_sub_file1).ok();
-    remove_file(&src_sub_file2).ok();
-    remove_dir_all(&src_sub_dir).ok();
-    remove_dir_all(&src_parent_dir).ok();
-}
-
-#[test]
-fn test_filter_src_dirs() {
-    let home_dir = env::var("HOME").expect("[ERROR]: failed to get the home directory");
-    let src_parent_dir = PathBuf::from(&home_dir).join("tmpsrc_filter_dir");
-
-    if src_parent_dir.exists() {
-        remove_dir_all(&src_parent_dir).ok();
-    }
-
-    let src_sub_dir = src_parent_dir.join("test_dir");
-
-    create_dir_all(&src_parent_dir).expect("[ERROR]: failed to create a source directory");
-    create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
-
-    let sync = SyncData {
-        source: src_parent_dir.clone(),
-        destination: PathBuf::new(),
-        changed_only: true,
-        delete: false,
-        verbose: false,
-        dry_run: false,
-    };
-
-    let list_dirs = sync.list_src_dirs();
-    let filtered = filter_src_dir(&list_dirs, &sync.source);
-    let dir = src_sub_dir
-        .iter()
-        .last()
-        .unwrap()
-        .to_string_lossy()
-        .to_string();
-
-    assert!(filtered.len() != 0 && !dir.is_empty());
-    assert_eq!(filtered[0], PathBuf::from(dir));
-}
-
-#[test]
-fn test_filter_dest_dirs() {
-    let home_dir = env::var("HOME").expect("[ERROR]: failed to get the home directory");
-    let dest_parent_dir = PathBuf::from(&home_dir).join("tmpdest_filter_dir");
-
-    if dest_parent_dir.exists() {
-        remove_dir_all(&dest_parent_dir).ok();
-    }
-
-    let dest_sub_dir = dest_parent_dir.join("test_dir");
-
-    create_dir_all(&dest_parent_dir).expect("[ERROR]: failed to create a destination directory");
-    create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
-
-    let sync = SyncData {
-        source: PathBuf::new(),
-        destination: dest_parent_dir.clone(),
-        changed_only: true,
-        delete: false,
-        verbose: false,
-        dry_run: false,
-    };
-
-    let list_dirs = sync.list_dest_dirs();
-    let filtered = filter_dest_dir(&list_dirs, &sync.destination);
-    let dir = dest_sub_dir
-        .iter()
-        .last()
-        .unwrap()
-        .to_string_lossy()
-        .to_string();
-
-    assert!(filtered.len() != 0 && !dir.is_empty());
-    assert_eq!(filtered[0], PathBuf::from(dir));
-}
-
-#[test]
-fn test_filter_src_files() {
-    let home_dir = env::var("HOME").expect("[ERROR]: failed to get the home directory");
-    let src_parent_dir = PathBuf::from(&home_dir).join("tmpsrc_filter_file");
-
-    if src_parent_dir.exists() {
-        remove_dir_all(&src_parent_dir).ok();
-    }
-
-    let src_sub_dir = src_parent_dir.join("test_dir");
-    let src_sub_file = src_sub_dir.join("common.txt");
-
-    create_dir_all(&src_parent_dir).expect("[ERROR]: failed to create a source directory");
-    create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
-    File::create(&src_sub_file).expect("[ERROR]: failed to create a file");
-
-    let sync = SyncData {
-        source: src_parent_dir.clone(),
-        destination: PathBuf::new(),
-        changed_only: true,
-        delete: false,
-        verbose: false,
-        dry_run: false,
-    };
-
-    let list_files = sync.list_src_files();
-    let filtered = filter_src_file(&list_files);
-    let file = src_sub_file
-        .file_name()
-        .expect("[ERROR]: failed to get the filename");
-
-    assert!(filtered.len() != 0 && !file.is_empty());
-    assert_eq!(filtered[0], PathBuf::from(file));
-}
-
-#[test]
-fn test_filter_dest_files() {
-    let home_dir = env::var("HOME").expect("[ERROR]: failed to get the home directory");
-    let dest_parent_dir = PathBuf::from(&home_dir).join("tmpdest_filter_file");
-
-    if dest_parent_dir.exists() {
-        remove_dir_all(&dest_parent_dir).ok();
-    }
-
-    let dest_sub_dir = dest_parent_dir.join("test_dir");
-    let dest_sub_file = dest_sub_dir.join("common.txt");
-
-    create_dir_all(&dest_parent_dir).expect("[ERROR]: failed to create a source directory");
-    create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a source directory");
-    File::create(&dest_sub_file).expect("[ERROR]: failed to create a file");
-
-    let sync = SyncData {
-        source: PathBuf::new(),
-        destination: dest_parent_dir.clone(),
-        changed_only: true,
-        delete: false,
-        verbose: false,
-        dry_run: false,
-    };
-
-    let list_files = sync.list_dest_files();
-    let filtered = filter_dest_file(&list_files);
-    let file = dest_sub_file
-        .file_name()
-        .expect("[ERROR]: failed to get the filename");
-
-    assert!(filtered.len() != 0 && !file.is_empty());
-    assert_eq!(filtered[0], PathBuf::from(file));
 }
