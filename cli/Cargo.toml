@@ -1,5 +1,5 @@
 [package]
-name = "cli"
+name = "cover-cli"
 description.workspace = true
 edition.workspace = true
 repository.workspace = true
