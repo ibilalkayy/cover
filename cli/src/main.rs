@@ -2,11 +2,11 @@ pub mod commands;
 pub mod flags;
 
 use crate::commands::commands::{Command, Cover};
-use backup::{
+use clap::Parser;
+use cover::{
     archive::archive::ArchiveData, clean::clean::CleanData, list::list::ListData,
     restore::restore::RestoreData, schedule::schedule::ScheduleData, sync::sync::SyncData,
 };
-use clap::Parser;
 
 /// This function handles all the commands of the Cover application.
 ///

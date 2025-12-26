@@ -16,7 +16,7 @@ impl SyncData {
     /// # Example
     ///
     /// ```rust,no_run
-    /// use backup::sync::sync::SyncData;
+    /// use cover::sync::sync::SyncData;
     /// use std::path::PathBuf;
     ///
     /// let sync = SyncData {

@@ -1,4 +1,4 @@
-use backup::sync::{
+use cover::sync::{
     log::{filter_dest_dir, filter_dest_file, filter_src_dir, filter_src_file},
     sync::SyncData,
 };
