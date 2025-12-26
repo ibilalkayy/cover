@@ -3,7 +3,7 @@ pub mod flags;
 
 use crate::commands::commands::{Command, Cover};
 use clap::Parser;
-use cover::{
+use cover_files::{
     archive::archive::ArchiveData, clean::clean::CleanData, list::list::ListData,
     restore::restore::RestoreData, schedule::schedule::ScheduleData, sync::sync::SyncData,
 };

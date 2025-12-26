@@ -13,7 +13,7 @@ impl SyncData {
     /// # Example
     ///
     /// ```rust,no_run
-    /// use cover::sync::sync::SyncData;
+    /// use cover_files::sync::sync::SyncData;
     /// use std::path::PathBuf;
     ///
     /// let sync = SyncData {
@@ -56,7 +56,7 @@ impl SyncData {
     /// # Example
     ///
     /// ```rust,no_run
-    /// use cover::sync::sync::SyncData;
+    /// use cover_files::sync::sync::SyncData;
     /// use std::path::PathBuf;
     ///
     /// let mut sync = SyncData {
@@ -110,7 +110,7 @@ impl SyncData {
     /// # Example
     ///
     /// ```rust,no_run
-    /// use cover::sync::sync::SyncData;
+    /// use cover_files::sync::sync::SyncData;
     /// use std::path::PathBuf;
     ///
     /// let sync = SyncData {
@@ -173,7 +173,7 @@ impl SyncData {
     /// # Example
     ///
     /// ```rust,no_run
-    /// use cover::sync::sync::SyncData;
+    /// use cover_files::sync::sync::SyncData;
     /// use std::path::PathBuf;
     ///
     /// let sync = SyncData {

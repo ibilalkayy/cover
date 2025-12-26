@@ -100,17 +100,17 @@ checksum = "b05b61dc5112cbb17e4b6cd61790d9845d13888356391624cbe7e41efeac1e75"
 
 [[package]]
 name = "cover"
-version = "0.1.19"
+version = "0.1.20"
 dependencies = [
- "walkdir",
+ "clap",
+ "cover-files",
 ]
 
 [[package]]
-name = "cover-cli"
-version = "0.1.19"
+name = "cover-files"
+version = "0.1.20"
 dependencies = [
- "clap",
- "cover",
+ "walkdir",
 ]
 
 [[package]]

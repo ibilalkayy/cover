@@ -1,5 +1,5 @@
 [package]
-name = "cover-cli"
+name = "cover"
 description.workspace = true
 edition.workspace = true
 repository.workspace = true
@@ -10,4 +10,4 @@ categories.workspace = true
 
 [dependencies]
 clap.workspace = true
-cover = { version = "0.1.17", path = "../crates/cover" }
+cover-files = { version = "0.1.20", path = "../crates/cover_files" }

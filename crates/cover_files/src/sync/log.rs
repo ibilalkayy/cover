@@ -13,8 +13,8 @@ use std::{collections::BTreeSet, path::PathBuf};
 /// # Example
 ///
 /// ```rust,no_run
-/// use cover::sync::sync::SyncData;
-/// use cover::sync::log::filter_src_dir;
+/// use cover_files::sync::sync::SyncData;
+/// use cover_files::sync::log::filter_src_dir;
 /// use std::path::PathBuf;
 ///
 /// let sync = SyncData {
@@ -58,8 +58,8 @@ pub fn filter_src_dir(src_dirs: &Vec<PathBuf>, source: &PathBuf) -> Vec<PathBuf>
 /// # Example
 ///
 /// ```rust,no_run
-/// use cover::sync::sync::SyncData;
-/// use cover::sync::log::filter_dest_dir;
+/// use cover_files::sync::sync::SyncData;
+/// use cover_files::sync::log::filter_dest_dir;
 /// use std::path::PathBuf;
 ///
 /// let sync = SyncData {
@@ -102,8 +102,8 @@ pub fn filter_dest_dir(dest_dirs: &Vec<PathBuf>, destination: &PathBuf) -> Vec<P
 /// # Example
 ///
 /// ```rust,no_run
-/// use cover::sync::sync::SyncData;
-/// use cover::sync::log::filter_src_file;
+/// use cover_files::sync::sync::SyncData;
+/// use cover_files::sync::log::filter_src_file;
 /// use std::path::PathBuf;
 ///
 /// let sync = SyncData {
@@ -143,8 +143,8 @@ pub fn filter_src_file(src_files: &Vec<PathBuf>) -> Vec<PathBuf> {
 /// # Example
 ///
 /// ```rust,no_run
-/// use cover::sync::sync::SyncData;
-/// use cover::sync::log::filter_dest_file;
+/// use cover_files::sync::sync::SyncData;
+/// use cover_files::sync::log::filter_dest_file;
 /// use std::path::PathBuf;
 ///
 /// let sync = SyncData {
