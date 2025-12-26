@@ -79,7 +79,7 @@ fn test_single_command_selected() {
 
     assert!(
         sync.single_command_selected(),
-        "[ERROR]: expected only one command, but multiple commands reported"
+        "[ERROR]: expected one command, but multiple are reported"
     );
 
     remove_dir_all(&src_parent_dir).ok();

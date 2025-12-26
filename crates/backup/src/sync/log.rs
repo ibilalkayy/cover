@@ -1,6 +1,35 @@
 use super::sync::SyncData;
 use std::{collections::BTreeSet, path::PathBuf};
 
+/// Lists the source sub-directories by skipping the parent directory name.
+///
+/// Takes:
+/// - List of all the source sub-directories
+/// - Name of the source directory
+///
+/// Returns:
+/// - List of source sub-directories after skipping the source directory name
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use backup::sync::sync::SyncData;
+/// use backup::sync::log::filter_src_dir;
+/// use std::path::PathBuf;
+///
+/// let sync = SyncData {
+///    source: PathBuf::from("source directory"),
+///    destination: PathBuf::new(),
+///    changed_only: true,
+///    delete: false,
+///    verbose: false,
+///    dry_run: false,
+/// };
+
+/// let list_dirs = sync.list_src_dirs();
+/// let filtered = filter_src_dir(&list_dirs, &sync.source);
+/// println!("{:?}", filtered);
+/// ```
 pub fn filter_src_dir(src_dirs: &Vec<PathBuf>, source: &PathBuf) -> Vec<PathBuf> {
     let mut list_src_dirs = Vec::new();
 
@@ -17,6 +46,35 @@ pub fn filter_src_dir(src_dirs: &Vec<PathBuf>, source: &PathBuf) -> Vec<PathBuf>
     list_src_dirs
 }
 
+/// Lists the destination sub-directories by skipping the parent directory name.
+///
+/// Takes:
+/// - List of all the destination sub-directories
+/// - Name of the destination directory
+///
+/// Returns:
+/// - List of destination sub-directories after skipping the destination directory name
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use backup::sync::sync::SyncData;
+/// use backup::sync::log::filter_dest_dir;
+/// use std::path::PathBuf;
+///
+/// let sync = SyncData {
+///    source: PathBuf::new(),
+///    destination: PathBuf::from("source directory"),
+///    changed_only: true,
+///    delete: false,
+///    verbose: false,
+///    dry_run: false,
+/// };
+
+/// let list_dirs = sync.list_dest_dirs();
+/// let filtered = filter_dest_dir(&list_dirs, &sync.destination);
+/// println!("{:?}", filtered);
+/// ```
 pub fn filter_dest_dir(dest_dirs: &Vec<PathBuf>, destination: &PathBuf) -> Vec<PathBuf> {
     let mut list_dest_dirs = Vec::new();
 
@@ -33,6 +91,34 @@ pub fn filter_dest_dir(dest_dirs: &Vec<PathBuf>, destination: &PathBuf) -> Vec<P
     list_dest_dirs
 }
 
+/// Lists the source files by skipping the whole path.
+///
+/// Takes:
+/// - List of all the source file names
+///
+/// Returns:
+/// - List of source filenames after skipping the path
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use backup::sync::sync::SyncData;
+/// use backup::sync::log::filter_src_file;
+/// use std::path::PathBuf;
+///
+/// let sync = SyncData {
+///    source: PathBuf::from("source directory"),
+///    destination: PathBuf::new(),
+///    changed_only: true,
+///    delete: false,
+///    verbose: false,
+///    dry_run: false,
+/// };
+
+/// let list_files = sync.list_src_files();
+/// let filtered = filter_src_file(&list_files);
+/// println!("{:?}", filtered);
+/// ```
 pub fn filter_src_file(src_files: &Vec<PathBuf>) -> Vec<PathBuf> {
     let mut list_src_files = Vec::new();
 
@@ -46,6 +132,34 @@ pub fn filter_src_file(src_files: &Vec<PathBuf>) -> Vec<PathBuf> {
     list_src_files
 }
 
+/// Lists the destination files by skipping the whole path.
+///
+/// Takes:
+/// - List of all the destination file names
+///
+/// Returns:
+/// - List of destination filenames after skipping the path
+///
+/// # Example
+///
+/// ```rust,no_run
+/// use backup::sync::sync::SyncData;
+/// use backup::sync::log::filter_dest_file;
+/// use std::path::PathBuf;
+///
+/// let sync = SyncData {
+///    source: PathBuf::new(),
+///    destination: PathBuf::from("destination directory"),
+///    changed_only: true,
+///    delete: false,
+///    verbose: false,
+///    dry_run: false,
+/// };
+
+/// let list_files = sync.list_dest_files();
+/// let filtered = filter_dest_file(&list_files);
+/// println!("{:?}", filtered);
+/// ```
 pub fn filter_dest_file(dest_files: &Vec<PathBuf>) -> Vec<PathBuf> {
     let mut list_dest_files = Vec::new();
 
@@ -115,7 +229,14 @@ fn list_data(data: [Vec<PathBuf>; 4], from: [PathBuf; 2]) -> [Vec<PathBuf>; 4] {
     result
 }
 
+/// Implementation of getting the logs of all the actions
 impl SyncData {
+    /// Gives the logs of the files and directories that will be copied from the source
+    ///
+    /// Lists all the source and destination files and directories, gives them the order,
+    /// and pushes their union files and directories in a vector.
+    ///
+    /// Prints the result at the end to show.
     pub fn src_creation_log(&self) {
         let src_dirs = self.list_src_dirs();
         let dest_dirs = self.list_dest_dirs();
@@ -171,6 +292,12 @@ impl SyncData {
         }
     }
 
+    /// Gives the logs of the source files that are modified.
+    ///
+    /// Lists all the source and destination files and directories,
+    /// and prints the modified files.
+    ///
+    /// After giving the status, updates the destination file according to it.
     pub fn src_modification_log(&self, filenames: Vec<PathBuf>) {
         let src_dirs = self.list_src_dirs();
         let dest_dirs = self.list_dest_dirs();
@@ -192,6 +319,12 @@ impl SyncData {
         print_format(&filenames);
     }
 
+    /// Gives the logs of the files and directories that will be removed from the destination
+    ///
+    /// Lists all the source and destination files and directories, gives them the order,
+    /// and pushes their union files and directories in a vector.
+    ///
+    /// Prints the result at the end to show.
     pub fn dest_creation_log(&self) {
         let src_dirs = self.list_src_dirs();
         let dest_dirs = self.list_dest_dirs();
@@ -247,6 +380,13 @@ impl SyncData {
         }
     }
 
+    /// Gives the logs of the destination files that are modified.
+    ///
+    /// Lists all the source and destination files and directories,
+    /// and prints the modified files.
+    ///
+    /// After giving the status, removed the destination file content.
+    /// The destination file content is not allowed to be modified.
     pub fn dest_modification_log(&self, filenames: Vec<PathBuf>) {
         let src_dirs = self.list_src_dirs();
         let dest_dirs = self.list_dest_dirs();

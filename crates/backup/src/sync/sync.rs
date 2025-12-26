@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+/// Requires the data for generating the output after running the commands.
 pub struct SyncData {
     pub source: PathBuf,
     pub destination: PathBuf,
@@ -9,21 +10,35 @@ pub struct SyncData {
     pub verbose: bool,
 }
 
+/// Points to the states that needs to be present.
+///
+/// Only one action is required to be hit at the time.
 pub enum FileState {
+    /// Checks if the source files are created
     SrcCreated,
+    /// Checks if the source files are modified
     SrcModified,
+    /// Checks if the destination files are created
     DestCreated,
+    /// Checks if the destination files are modified
     DestModified,
+    /// Checks if no changes happened
     NoChange,
 }
 
+/// Points to the actions that needs to be taken.
 pub enum FileAction {
+    /// Copy only the changed files
     ChangedOnly,
+    /// Show detailed logs
     Verbose,
+    /// Show what would happen after syncing
     DryRun,
+    /// Remove files in destination not in source
     Delete,
 }
 
+/// Implementation for the output that will be generated after running the command.
 impl SyncData {
     fn to_action(&self) -> FileAction {
         if self.changed_only {
@@ -66,6 +81,11 @@ impl SyncData {
         (modified_src_file, modified_dest_file, state)
     }
 
+    /// Runs the sync operation between the source and destination.
+    ///
+    /// This function validates the selected options and executes the
+    /// suitble sync action (changed-only, verbose, dry-run, or delete).
+    /// Any errors or status messages are printed to standard output.
     pub fn sync_output(&mut self) {
         if !self.src_dest_dir_present() {
             eprintln!("[ERROR]: missing source or destination directories");
@@ -74,7 +94,7 @@ impl SyncData {
 
         if !self.single_command_selected() {
             eprintln!(
-                "[ERROR]: no option or multiple options are selected. See 'cargo run sync --help'"
+                "[ERROR]: no or multiple option(s) are selected. See 'cargo run sync --help'"
             );
             return;
         }
@@ -162,6 +182,7 @@ impl SyncData {
         }
     }
 
+    /// Executes the selected sync option.
     pub fn sync_options(&mut self) {
         self.sync_output();
     }

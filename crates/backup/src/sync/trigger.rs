@@ -5,7 +5,31 @@ use std::{
     path::PathBuf,
 };
 
+/// Implementation for actions performed on the files.
 impl SyncData {
+    /// It copies the files and directories from the source to the destination.
+    ///
+    /// Lists the files and directories, finds the relative files and directories and checks the existance of them.
+    ///
+    /// Copies them if there is no existance in the destination.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use backup::sync::sync::SyncData;
+    /// use std::path::PathBuf;
+    ///
+    /// let sync = SyncData {
+    ///     source: PathBuf::from("source_directory"),
+    ///     destination: PathBuf::from("destination_directory"),
+    ///     changed_only: true,
+    ///     delete: false,
+    ///     verbose: false,
+    ///     dry_run: false,
+    /// };
+    ///
+    /// sync.copy_src_to_dest();
+    /// ```
     pub fn copy_src_to_dest(&self) {
         let src_dirs = self.list_src_dirs();
         let src_files = self.list_src_files();
@@ -42,6 +66,33 @@ impl SyncData {
         }
     }
 
+    /// Updates the destination file when the modification happens in the source.
+    ///
+    /// Takes:
+    /// - List of modified files
+    ///
+    /// Goes through the list of source files, iters by trimming the source from it. Goes through the loop and find the relative path.
+    ///
+    /// Removes a file if it exists in the destination and copy the modified one from the source.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use backup::sync::sync::SyncData;
+    /// use std::path::PathBuf;
+    ///
+    /// let sync = SyncData {
+    ///     source: PathBuf::from("source_directory"),
+    ///     destination: PathBuf::from("destination_directory"),
+    ///     changed_only: true,
+    ///     delete: false,
+    ///     verbose: false,
+    ///     dry_run: false,
+    /// };
+    ///
+    /// let (modified_src_file, src_modified) = sync.src_file_modified();
+    /// println!("File: {:?}\n Modification status: {}", modified_src_file, src_modified);
+    /// ```
     pub fn update_dest_file(&self, file_names: Vec<PathBuf>) {
         let src_files = self.list_src_files();
         let relative_src = src_files
@@ -66,6 +117,33 @@ impl SyncData {
         }
     }
 
+    /// Removes the destination file if it is not found in the source
+    ///
+    /// This function compares the source and destination directories by their
+    /// relative paths. Any file or directory that exists in the destination
+    /// but not in the source is removed.
+    ///
+    /// The comparison is performed separately for directories and files.
+    /// If an extra file is found, it is removed first. Otherwise, the
+    /// deepest extra directory is removed.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use backup::sync::sync::SyncData;
+    /// use std::path::PathBuf;
+    ///
+    /// let sync = SyncData {
+    ///     source: PathBuf::from("source_directory"),
+    ///     destination: PathBuf::from("destination_directory"),
+    ///     changed_only: true,
+    ///     delete: false,
+    ///     verbose: false,
+    ///     dry_run: false,
+    /// };
+    ///
+    /// sync.remove_dest_file();
+    /// ```
     pub fn remove_dest_file(&self) {
         let src_dirs = self.list_src_dirs();
         let dest_dirs = self.list_dest_dirs();
@@ -179,6 +257,28 @@ impl SyncData {
         }
     }
 
+    /// Removes all the destination files even if they exist in the source
+    ///
+    /// Lists all the destination directories and files, iter them.
+    /// Checks the existance and remove them all.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use backup::sync::sync::SyncData;
+    /// use std::path::PathBuf;
+    ///
+    /// let sync = SyncData {
+    ///     source: PathBuf::new(),
+    ///     destination: PathBuf::from("destination_directory"),
+    ///     changed_only: true,
+    ///     delete: false,
+    ///     verbose: false,
+    ///     dry_run: false,
+    /// };
+    ///
+    /// sync.remove_all_dest_files();
+    /// ```
     pub fn remove_all_dest_files(&self) {
         let dest_dirs = self.list_dest_dirs();
         let dest_files = self.list_dest_files();

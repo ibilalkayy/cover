@@ -14,8 +14,8 @@ impl SyncData {
     ///
     /// # Example
     ///
-    /// ```
-    /// use my_crate::SyncData;
+    /// ```rust,no_run
+    /// use backup::sync::sync::SyncData;
     /// use std::path::PathBuf;
     ///
     /// let sync = SyncData {
@@ -27,9 +27,8 @@ impl SyncData {
     ///     verbose: false,
     /// };
     ///
-    /// let file_found = true;
     /// let created = sync.src_file_created();
-    /// assert_eq!(created, file_found);
+    /// assert!(created);
     /// ```
     pub fn src_file_created(&self) -> bool {
         let dir_path = self.list_src_dirs();
@@ -79,8 +78,8 @@ impl SyncData {
     ///
     /// # Example
     ///
-    /// ```
-    /// use my_crate::SyncData;
+    /// ```rust,no_run
+    /// use backup::sync::sync::SyncData;
     /// use std::path::PathBuf;
     ///
     /// let sync = SyncData {
@@ -145,8 +144,8 @@ impl SyncData {
     ///
     /// # Example
     ///
-    /// ```
-    /// use my_crate::SyncData;
+    /// ```rust,no_run
+    /// use backup::sync::sync::SyncData;
     /// use std::path::PathBuf;
     ///
     /// let sync = SyncData {
@@ -158,9 +157,8 @@ impl SyncData {
     ///     verbose: false,
     /// };
     ///
-    /// let file_found = true;
     /// let created = sync.dest_file_created();
-    /// assert_eq!(created, file_found);
+    /// assert!(created);
     /// ```
     pub fn dest_file_created(&self) -> bool {
         let dir_path = self.list_dest_dirs();
@@ -210,8 +208,8 @@ impl SyncData {
     ///
     /// # Example
     ///
-    /// ```
-    /// use my_crate::SyncData;
+    /// ```rust,no_run
+    /// use backup::sync::sync::SyncData;
     /// use std::path::PathBuf;
     ///
     /// let sync = SyncData {

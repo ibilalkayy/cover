@@ -1,8 +1,32 @@
+use super::sync::SyncData;
 use std::{collections::HashSet, path::PathBuf};
 
-use super::sync::SyncData;
-
+/// Implemenation of the helper methods used in other methods.
 impl SyncData {
+    /// Checks the source and destination directories presence.
+    ///
+    /// Returns:
+    /// - Boolean to see the directories are not empty.
+    ///
+    /// Verifiies the existance of source and destination and also used as directories.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use backup::sync::sync::SyncData;
+    /// use std::path::PathBuf;
+    ///
+    /// let sync = SyncData {
+    ///     source: PathBuf::from("source_directory"),
+    ///     destination: PathBuf::from("destination_directory"),
+    ///     changed_only: true,
+    ///     delete: false,
+    ///     dry_run: false,
+    ///     verbose: false,
+    /// };
+    ///
+    /// assert!(sync.src_dest_dir_present(), "[ERROR]: source or destination not detected");
+    /// ```
     pub fn src_dest_dir_present(&self) -> bool {
         let src_not_empty = !self.source.to_string_lossy().trim().is_empty();
         let dest_not_empty = !self.destination.to_string_lossy().trim().is_empty();
@@ -22,6 +46,30 @@ impl SyncData {
         }
     }
 
+    /// Allows only one flag after the source and destination.
+    ///
+    /// Returns:
+    /// - Boolean to check the selection.
+    ///
+    /// Checks the source and destination as directories and count the flag if they are given.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use backup::sync::sync::SyncData;
+    /// use std::path::PathBuf;
+    ///
+    /// let mut sync = SyncData {
+    ///     source: PathBuf::from("source_directory"),
+    ///     destination: PathBuf::from("destination_directory"),
+    ///     changed_only: true,
+    ///     delete: false,
+    ///     dry_run: false,
+    ///     verbose: false,
+    /// };
+    ///
+    /// assert!(sync.single_command_selected(), "[ERROR]: expected one command, but multiple are reported");
+    /// ```
     pub fn single_command_selected(&mut self) -> bool {
         let source_contains = !self.source.to_string_lossy().trim().is_empty();
         let destination_contains = !self.destination.to_string_lossy().trim().is_empty();
@@ -51,6 +99,32 @@ impl SyncData {
         count == 1
     }
 
+    /// Gets the file and directory names for checking the duplication.
+    ///
+    /// Returns:
+    /// - Directories list
+    /// - Files list
+    ///
+    /// After listing the files and directories, splits the full path of them and takes only the last name to return.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use backup::sync::sync::SyncData;
+    /// use std::path::PathBuf;
+    ///
+    /// let sync = SyncData {
+    ///     source: PathBuf::from("source_directory"),
+    ///     destination: PathBuf::new(),
+    ///     changed_only: true,
+    ///     delete: false,
+    ///     dry_run: false,
+    ///     verbose: false,
+    /// };
+    ///
+    /// let (dir_list, file_list) = sync.get_file_names();
+    /// assert!(dir_list.len() != 0 && file_list.len() != 0);
+    /// ```
     pub fn get_file_names(&self) -> (Vec<PathBuf>, Vec<PathBuf>) {
         let mut dir_list: Vec<PathBuf> = Vec::new();
         let mut file_list: Vec<PathBuf> = Vec::new();
@@ -91,6 +165,29 @@ impl SyncData {
         (dir_list, file_list)
     }
 
+    /// It prevents the duplication of files and directories to be inserted.
+    ///
+    /// Returns:
+    /// - Boolean to check if the files or directories has duplicates.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use backup::sync::sync::SyncData;
+    /// use std::path::PathBuf;
+    ///
+    /// let sync = SyncData {
+    ///     source: PathBuf::from("source_directory"),
+    ///     destination: PathBuf::from("destination_directory"),
+    ///     changed_only: true,
+    ///     delete: false,
+    ///     dry_run: false,
+    ///     verbose: false,
+    /// };
+    ///
+    /// let result = sync.has_duplicates();
+    /// assert!(result == true);
+    /// ```
     pub fn has_duplicates(&self) -> bool {
         let mut dir_hash: HashSet<PathBuf> = HashSet::new();
         let mut file_hash: HashSet<PathBuf> = HashSet::new();

@@ -54,7 +54,7 @@ dependencies = [
 
 [[package]]
 name = "backup"
-version = "0.1.15"
+version = "0.1.16"
 dependencies = [
  "walkdir",
 ]
@@ -101,7 +101,7 @@ checksum = "b94f61472cee1439c0b966b47e3aca9ae07e45d070759512cd390ea2bebc6675"
 
 [[package]]
 name = "cli"
-version = "0.1.15"
+version = "0.1.16"
 dependencies = [
  "backup",
  "clap",
