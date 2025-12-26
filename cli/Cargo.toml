@@ -10,4 +10,4 @@ categories.workspace = true
 
 [dependencies]
 clap.workspace = true
-backup    = { path = "../crates/backup" }
+backup = { version = "0.1.17", path = "../crates/backup" }
