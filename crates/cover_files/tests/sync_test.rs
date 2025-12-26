@@ -1025,7 +1025,7 @@ fn test_filter_dest_files() {
 #[test]
 fn test_src_dir_present() {
     let home_dir = env::var("HOME").expect("[ERROR]: failed to get the home directory");
-    let src_parent_dir = PathBuf::from(&home_dir).join("tmpsrc_present");
+    let src_parent_dir = PathBuf::from(&home_dir).join("tmpsrc_presence");
 
     if src_parent_dir.exists() {
         remove_dir_all(&src_parent_dir).ok();
@@ -1053,7 +1053,7 @@ fn test_src_dir_present() {
 #[test]
 fn test_dest_dir_present() {
     let home_dir = env::var("HOME").expect("HOME env variable not set");
-    let dest_parent_dir = PathBuf::from(&home_dir).join("tmpdest_present");
+    let dest_parent_dir = PathBuf::from(&home_dir).join("tmpdest_presence");
 
     if dest_parent_dir.exists() {
         remove_dir_all(&dest_parent_dir).ok();
