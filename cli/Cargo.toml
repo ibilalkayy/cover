@@ -1,5 +1,6 @@
 [package]
 name = "cli"
+description.workspace = true
 edition.workspace = true
 repository.workspace = true
 version.workspace = true
