@@ -23,6 +23,7 @@
 - [Features](#features)
   - [Present Features](#present-features)
   - [Upcoming Features](#upcoming-features)
+- [Docs](#docs)
 - [Get Started](#get-started)
 - [Installation](#installation)
 - [License](#license)
@@ -46,11 +47,19 @@ Cover is a Rust application where the source and destination are synced and any 
 - **List** archives and scheduled jobs
 - **Clean** old backups with rules (`--keep-last`, `--older-than`)
 
+## Docs
+
+Here is the docs that you can read it yourself.
+
+- [Cover Docs](https://docs.rs/crate/cover-files/)
+
 ## Get Started
 
 ```bash
-cargo add cover
+cargo install cover
 ```
+
+### Commands 
 
 ```bash
 cover sync
@@ -59,7 +68,6 @@ cover restore
 cover schedule
 cover list
 cover clean
-cover help
 ```
 
 ```bash
