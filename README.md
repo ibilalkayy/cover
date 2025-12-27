@@ -1,5 +1,9 @@
 <p align="center">
-  <img src="logo.png" alt="Logo" width="500"/>
+    <img
+    src="https://raw.githubusercontent.com/ibilalkayy/cover/main/logo.png"
+    alt="Logo"
+    width="500"
+    />
 </p>
 
 <p align="center">

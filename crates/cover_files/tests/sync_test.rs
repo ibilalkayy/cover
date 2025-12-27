@@ -912,6 +912,9 @@ fn test_filter_src_dirs() {
 
     assert!(filtered.len() != 0 && !dir.is_empty());
     assert_eq!(filtered[0], PathBuf::from(dir));
+
+    remove_dir_all(src_sub_dir).ok();
+    remove_dir_all(src_parent_dir).ok();
 }
 
 #[test]
@@ -948,6 +951,9 @@ fn test_filter_dest_dirs() {
 
     assert!(filtered.len() != 0 && !dir.is_empty());
     assert_eq!(filtered[0], PathBuf::from(dir));
+
+    remove_dir_all(dest_sub_dir).ok();
+    remove_dir_all(dest_parent_dir).ok();
 }
 
 #[test]
@@ -983,6 +989,10 @@ fn test_filter_src_files() {
 
     assert!(filtered.len() != 0 && !file.is_empty());
     assert_eq!(filtered[0], PathBuf::from(file));
+
+    remove_file(src_sub_file).ok();
+    remove_dir_all(src_sub_dir).ok();
+    remove_dir_all(src_parent_dir).ok();
 }
 
 #[test]
@@ -1018,6 +1028,10 @@ fn test_filter_dest_files() {
 
     assert!(filtered.len() != 0 && !file.is_empty());
     assert_eq!(filtered[0], PathBuf::from(file));
+
+    remove_file(dest_sub_file).ok();
+    remove_dir_all(dest_sub_dir).ok();
+    remove_dir_all(dest_parent_dir).ok();
 }
 
 // ----------------------------------------------- Edge Case ------------------------------------------------
