@@ -9,3 +9,4 @@ categories.workspace = true
 
 [dependencies]
 walkdir.workspace = true
+zip.workspace = true

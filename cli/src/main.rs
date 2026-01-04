@@ -38,6 +38,7 @@ fn handle_commands() {
         }
         Command::Archive(a) => {
             let archive_data = ArchiveData {
+                source: a.source,
                 zip: a.zip,
                 tar: a.tar,
                 encrypt: a.encrypt,

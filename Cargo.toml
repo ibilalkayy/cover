@@ -4,13 +4,14 @@ members = ["cli", "crates/*"]
 
 [workspace.dependencies]
 clap = { version = "4.5.47", features = ["derive"] }
+zip = { version = "7.0.0", default-features = false }
 walkdir = "2.5.0"
 
 [workspace.package]
 description = "A simple Rust tool for syncing directories with change detection"
 edition = "2024"
 repository = "https://github.com/ibilalkayy/cover"
-version = "0.1.22"
+version = "0.1.23"
 license = "Apache-2.0"
 readme = "README.md"
 keywords = ["backup", "sync", "filesystem"]

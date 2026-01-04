@@ -1,8 +1,47 @@
 use super::sync::SyncData;
-use std::{fs::read_to_string, path::PathBuf};
+use std::{
+    fs::File,
+    io::{BufReader, Read},
+    path::PathBuf,
+};
+
+const CHUNK_SIZE: usize = 8 * 1024;
 
 /// Implementation of the source and destination files that are created or modified.
 impl SyncData {
+    pub fn files_are_equal(&self, src_file: &PathBuf, dest_file: &PathBuf) -> bool {
+        let src_open = File::open(src_file).expect("[ERROR]: failed to open the source file");
+        let dest_open =
+            File::open(dest_file).expect("[ERROR]: failed to open the destination file");
+
+        let mut src_reader = BufReader::new(src_open);
+        let mut dest_reader = BufReader::new(dest_open);
+
+        let mut buf_src = [0u8; CHUNK_SIZE];
+        let mut buf_dest = [0u8; CHUNK_SIZE];
+
+        loop {
+            let src_content = src_reader
+                .read(&mut buf_src)
+                .expect("[ERROR]: failed to read the file");
+            let dest_content = dest_reader
+                .read(&mut buf_dest)
+                .expect("[ERROR]: failed to read the file");
+
+            if src_content != dest_content {
+                return false;
+            }
+
+            if src_content == 0 {
+                return true;
+            }
+
+            if buf_src[..src_content] != buf_dest[..dest_content] {
+                return false;
+            }
+        }
+    }
+
     /// Checks whether the source file is created or not.
     ///
     /// Resturns:
@@ -115,12 +154,7 @@ impl SyncData {
                         let src_path = self.source.join(path);
                         let dest_path = self.destination.join(path);
 
-                        let src_content =
-                            read_to_string(src_path).expect("[ERROR]: failed to read the file");
-                        let dest_content =
-                            read_to_string(dest_path).expect("[ERROR]: failed to read the file");
-
-                        if src_content != dest_content {
+                        if !self.files_are_equal(&src_path, &dest_path) {
                             modified_files.push(path.clone());
                         }
                     }
@@ -245,12 +279,7 @@ impl SyncData {
                         let src_path = self.source.join(path);
                         let dest_path = self.destination.join(path);
 
-                        let src_content =
-                            read_to_string(src_path).expect("[ERROR]: failed to read the file");
-                        let dest_content =
-                            read_to_string(dest_path).expect("[ERROR]: failed to read the file");
-
-                        if src_content != dest_content {
+                        if !self.files_are_equal(&src_path, &dest_path) {
                             modified_files.push(path.clone());
                         }
                     }

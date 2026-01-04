@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use clap::Parser;
 
 /// It takes the required information for archiving the data
@@ -11,6 +13,7 @@ use clap::Parser;
 /// use my_crate::ArchiveData;
 ///
 /// let archive = ArchiveData {
+///     source: PathBuf::from("source_directory"),
 ///     zip: true,
 ///     tar: false,
 ///     encrypt: false,
@@ -19,6 +22,10 @@ use clap::Parser;
 /// ```
 #[derive(Debug, Parser)]
 pub struct ArchiveData {
+    /// Source folder to take the file from
+    #[clap(short, long)]
+    pub source: PathBuf,
+
     /// Save the file as .zip
     #[clap(long)]
     pub zip: bool,

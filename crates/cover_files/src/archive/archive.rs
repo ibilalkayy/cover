@@ -1,4 +1,7 @@
+use std::path::PathBuf;
+
 pub struct ArchiveData {
+    pub source: PathBuf,
     pub zip: bool,
     pub tar: bool,
     pub encrypt: bool,

@@ -16,7 +16,7 @@ use walkdir::WalkDir;
 
 #[test]
 fn test_src_dest_dir_present() {
-    let home_dir = env::var("HOME").expect("HOME env variable not set");
+    let home_dir = env::var("HOME").expect("[ERROR]: failed to get the home directory");
 
     let src_parent_dir = PathBuf::from(&home_dir).join("tmpsrc_present");
     let dest_parent_dir = PathBuf::from(&home_dir).join("tmpdest_present");
@@ -1066,7 +1066,7 @@ fn test_src_dir_present() {
 
 #[test]
 fn test_dest_dir_present() {
-    let home_dir = env::var("HOME").expect("HOME env variable not set");
+    let home_dir = env::var("HOME").expect("[ERROR]: failed to get the home directory");
     let dest_parent_dir = PathBuf::from(&home_dir).join("tmpdest_presence");
 
     if dest_parent_dir.exists() {
