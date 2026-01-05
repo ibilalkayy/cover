@@ -119,13 +119,15 @@ impl SyncData {
                     }
                     FileState::DestCreated => {
                         self.remove_dest_file();
-                        println!("[SUCCESS]: successfully removed the file(s)");
-                        println!("[MSG]: Extra file(s) are not allowed in the destination");
+                        println!(
+                            "[MESSAGE]: extra file(s) are not allowed in the destination. They are removed"
+                        );
                     }
                     FileState::DestModified => {
                         self.update_dest_file(modified_dest_file);
-                        println!("[SUCCESS]: successfully overwritten the file(s)");
-                        println!("[MSG]: File modification is not allowed in the destination")
+                        println!(
+                            "[MESSAGE]: file modification is not allowed in the destination. They are overwritten"
+                        )
                     }
                     FileState::NoChange => {
                         println!("[STATUS]: no changes detected");

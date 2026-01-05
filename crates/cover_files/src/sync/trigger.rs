@@ -307,7 +307,7 @@ impl SyncData {
         if removed {
             println!("[SUCCESS]: destination file(s) successfully deleted");
         } else {
-            eprintln!("[MSG]: no files are present to be removed");
+            eprintln!("[MESSAGE]: no files are present to be removed");
         }
     }
 }
