@@ -9,6 +9,34 @@ const CHUNK_SIZE: usize = 8 * 1024;
 
 /// Implementation of the source and destination files that are created or modified.
 impl SyncData {
+    /// Verifies whether the source and destination file content is equal.
+    ///
+    /// Takes:
+    /// - Source and Destination file for comparison
+    ///
+    /// Returns:
+    /// - Boolean to show the comparison status
+    ///
+    /// Opens the source and destination files and reads them through buffer. Compares their content to see if there is inequality.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use cover_files::sync::sync::SyncData;
+    /// use std::path::PathBuf;
+    ///
+    /// let sync = SyncData {
+    ///     source: PathBuf::from("source_directory"),
+    ///     destination: PathBuf::from("destination_directory"),
+    ///     changed_only: true,
+    ///     delete: false,
+    ///     dry_run: false,
+    ///     verbose: false,
+    /// };
+    ///
+    /// let equal = sync.files_are_equal(&PathBuf::from("source.txt"), &PathBuf::from("destination.txt"));
+    /// assert!(equal);
+    /// ```
     pub fn files_are_equal(&self, src_file: &PathBuf, dest_file: &PathBuf) -> bool {
         let src_open = File::open(src_file).expect("[ERROR]: failed to open the source file");
         let dest_open =

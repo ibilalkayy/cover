@@ -315,6 +315,59 @@ fn test_file_timestamp() {
 }
 
 #[test]
+fn test_files_are_equal() {
+    let home_dir = env::var("HOME").expect("[ERROR]: failed to get the home directory");
+    let src_parent_dir = PathBuf::from(&home_dir).join("tmpsrc_equal");
+    let dest_parent_dir = PathBuf::from(&home_dir).join("tmpdest_equal");
+
+    if src_parent_dir.exists() {
+        remove_dir_all(&src_parent_dir).ok();
+    }
+
+    if dest_parent_dir.exists() {
+        remove_dir_all(&dest_parent_dir).ok();
+    }
+
+    let src_sub_dir = src_parent_dir.join("test_dir");
+    let dest_sub_dir = dest_parent_dir.join("test_dir");
+
+    let src_sub_file = src_sub_dir.join("common.txt");
+    let dest_sub_file = dest_sub_dir.join("common.txt");
+
+    create_dir_all(&src_parent_dir).expect("[ERROR]: failed to create a source directory");
+    create_dir_all(&dest_parent_dir).expect("[ERROR]: failed to create a destination directory");
+
+    create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
+    create_dir_all(&dest_sub_dir).expect("[ERROR]: failed to create a destination directory");
+
+    File::create(&src_sub_file).expect("[ERROR]: failed to create a source file");
+    File::create(&dest_sub_file).expect("[ERROR]: failed to create a destination file");
+
+    write(&src_sub_file, "same content").expect("[ERROR]: failed to write the file");
+    thread::sleep(time::Duration::from_secs(1));
+    write(&dest_sub_file, "same content").expect("[ERROR]: failed to write the file");
+
+    let sync = SyncData {
+        source: src_parent_dir.clone(),
+        destination: dest_parent_dir.clone(),
+        changed_only: true,
+        delete: false,
+        verbose: false,
+        dry_run: false,
+    };
+
+    let equal = sync.files_are_equal(&src_sub_file, &dest_sub_file);
+    assert!(equal);
+
+    remove_file(&src_sub_file).ok();
+    remove_file(&dest_sub_file).ok();
+    remove_dir_all(&src_sub_dir).ok();
+    remove_dir_all(&dest_sub_dir).ok();
+    remove_dir_all(&src_parent_dir).ok();
+    remove_dir_all(&dest_parent_dir).ok();
+}
+
+#[test]
 fn test_src_file_created() {
     let home_dir = env::var("HOME").expect("[ERROR]: failed to get the home directory");
     let src_parent_dir = PathBuf::from(home_dir).join("tmpsrc_creation");
@@ -327,7 +380,7 @@ fn test_src_file_created() {
     let src_sub_file = src_sub_dir.join("src_file_creation.txt");
 
     create_dir_all(&src_parent_dir).expect("[ERROR]: failed to create a source directory");
-    create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a destination directory");
+    create_dir_all(&src_sub_dir).expect("[ERROR]: failed to create a source directory");
     File::create(&src_sub_file).expect("[ERROR]: failed to create a source file");
 
     let mut file_found = false;
