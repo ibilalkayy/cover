@@ -27,7 +27,7 @@ pub enum FileState {
 }
 
 /// Points to the actions that needs to be taken.
-pub enum FileAction {
+pub enum ActionType {
     /// Copy only the changed files
     ChangedOnly,
     /// Show detailed logs
@@ -38,47 +38,52 @@ pub enum FileAction {
     Delete,
 }
 
+pub enum SyncAction {
+    Copy,
+    Rename,
+    Update,
+    Delete,
+    Nothing,
+}
+
+pub struct ActionData {
+    pub copy: bool,
+    pub rename: bool,
+    pub update: bool,
+    pub delete: bool,
+    pub nothing: bool,
+}
+
+impl ActionData {
+    fn action_data(&self) -> SyncAction {
+        if self.copy {
+            SyncAction::Copy
+        } else if self.rename {
+            SyncAction::Rename
+        } else if self.update {
+            SyncAction::Update
+        } else if self.delete {
+            SyncAction::Delete
+        } else {
+            SyncAction::Nothing
+        }
+    }
+}
+
 /// Implementation for the output that will be generated after running the command.
 impl SyncData {
-    fn to_action(&self) -> FileAction {
+    pub fn action_type(&self) -> ActionType {
         if self.changed_only {
-            FileAction::ChangedOnly
+            ActionType::ChangedOnly
         } else if self.verbose {
-            FileAction::Verbose
+            ActionType::Verbose
         } else if self.dry_run {
-            FileAction::DryRun
+            ActionType::DryRun
         } else if self.delete {
-            FileAction::Delete
+            ActionType::Delete
         } else {
-            FileAction::Verbose
+            ActionType::Verbose
         }
-    }
-
-    fn to_state(&self, condition: &mut [bool]) -> FileState {
-        if condition[0] {
-            FileState::SrcCreated
-        } else if condition[1] {
-            FileState::SrcModified
-        } else if condition[2] {
-            FileState::DestCreated
-        } else if condition[3] {
-            FileState::DestModified
-        } else {
-            FileState::NoChange
-        }
-    }
-
-    fn file_status(&self) -> (Vec<PathBuf>, Vec<PathBuf>, FileState) {
-        let src_created = self.src_file_created();
-        let (modified_src_file, src_modified) = self.src_file_modified();
-
-        let dest_created = self.dest_file_created();
-        let (modified_dest_file, dest_modified) = self.dest_file_modified();
-
-        let mut condition: [bool; 4] = [src_created, src_modified, dest_created, dest_modified];
-        let state = self.to_state(&mut condition);
-
-        (modified_src_file, modified_dest_file, state)
     }
 
     /// Runs the sync operation between the source and destination.
@@ -87,98 +92,66 @@ impl SyncData {
     /// suitble sync action (changed-only, verbose, dry-run, or delete).
     /// Any errors or status messages are printed to standard output.
     pub fn sync_output(&mut self) {
-        if !self.src_dest_dir_present() {
-            eprintln!("[ERROR]: missing source or destination directories");
+        if self.has_duplicates() {
+            eprintln!("[ERROR]: duplicate files or directories are not allowed");
             return;
         }
+
+        // if both update and renamed in the source or destination then there are "changes detected message" is given.
+
+        if self.do_rename() {
+            println!("[MESSAGE]: successfully renamed the destination file(s)");
+        } else if self.do_copy() {
+            println!("[MESSAGE]: successfully copied the source file(s)");
+        } else if self.do_update() {
+            println!("[MESSAGE]: successfully updated the destination file(s)");
+        } else if self.do_nothing() {
+            println!("[MESSAGE]: no changes detected");
+            return;
+        } else {
+            println!("[MESSAGE]: changes detected");
+        };
+
+        let data = ActionData {
+            copy: false,
+            rename: false,
+            update: false,
+            delete: false,
+            nothing: false,
+        };
 
         if !self.single_command_selected() {
-            eprintln!(
-                "[ERROR]: no or multiple option(s) are selected. See 'cargo run sync --help'"
+            panic!(
+                "[ERROR]: none or multiple command(s) are selected. See 'cargo run sync --help'"
             );
-            return;
         }
 
-        if self.has_duplicates() {
-            eprintln!("[ERROR]: duplicate files and directories are not allowed");
-            return;
-        }
+        let action = self.action_type();
+        let choice = data.action_data();
 
-        let action = self.to_action();
         match action {
-            FileAction::ChangedOnly => {
-                let (modified_src_file, modified_dest_file, state) = self.file_status();
-                match state {
-                    FileState::SrcCreated => {
-                        self.copy_src_to_dest();
-                        println!("[SUCCESS]: successfully copied source file(s)");
-                    }
-                    FileState::SrcModified => {
-                        self.update_dest_file(modified_src_file);
-                        println!("[SUCCESS]: successfully updated destination file(s)");
-                    }
-                    FileState::DestCreated => {
-                        self.remove_dest_file();
-                        println!(
-                            "[MESSAGE]: extra file(s) are not allowed in the destination. They are removed"
-                        );
-                    }
-                    FileState::DestModified => {
-                        self.update_dest_file(modified_dest_file);
-                        println!(
-                            "[MESSAGE]: file modification is not allowed in the destination. They are overwritten"
-                        )
-                    }
-                    FileState::NoChange => {
-                        println!("[STATUS]: no changes detected");
-                    }
+            ActionType::ChangedOnly => match choice {
+                SyncAction::Copy => {
+                    println!("[SUCCESS]: successfully copied the source file(s)");
                 }
-            }
-            FileAction::Verbose => {
-                let (modified_src_file, modified_dest_file, state) = self.file_status();
-                match state {
-                    FileState::SrcCreated => {
-                        self.src_creation_log();
-                    }
-                    FileState::SrcModified => {
-                        self.src_modification_log(modified_src_file);
-                    }
-                    FileState::DestCreated => {
-                        self.dest_creation_log();
-                    }
-                    FileState::DestModified => {
-                        self.dest_modification_log(modified_dest_file);
-                    }
-                    FileState::NoChange => {
-                        println!("[STATUS]: no changes detected");
-                    }
+                SyncAction::Rename => {
+                    println!("[SUCCESS]: successfully renamed the destination file(s)");
                 }
-            }
-            FileAction::DryRun => {
-                let (_, _, state) = self.file_status();
-                match state {
-                    FileState::SrcCreated => {
-                        println!("[DRY RUN]: will copy the source file(s) to destination");
-                    }
-                    FileState::SrcModified => {
-                        println!("[DRY RUN]: will update the destination file(s)");
-                    }
-                    FileState::DestCreated => {
-                        println!("[DRY RUN]: will prevent the creation of destination file(s)");
-                    }
-                    FileState::DestModified => {
-                        println!(
-                            "[DRY RUN]: will overwrite the destination file(s) with source file(s)"
-                        );
-                    }
-                    FileState::NoChange => {
-                        eprintln!("[DRY RUN]: will give the 'no changes detected' message");
-                    }
+                SyncAction::Update => {
+                    println!("[SUCCESS]: successfully updated the destination file(s)");
                 }
-            }
-            FileAction::Delete => {
-                self.remove_all_dest_files();
-            }
+                SyncAction::Delete => {
+                    println!(
+                        "[MESSAGE]: File modification is not allowed in the destination. They are overwritten"
+                    );
+                }
+                SyncAction::Nothing => {
+                    eprintln!("[ERROR]: no changes detected");
+                }
+            },
+            ActionType::Verbose => todo!(),
+            ActionType::DryRun => todo!(),
+            ActionType::Delete => todo!(),
         }
     }
 

@@ -10,3 +10,6 @@ categories.workspace = true
 [dependencies]
 walkdir.workspace = true
 zip.workspace = true
+blake2.workspace = true
+file-hashing.workspace = true
+itertools.workspace = true

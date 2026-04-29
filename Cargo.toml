@@ -6,6 +6,9 @@ members = ["cli", "crates/*"]
 clap = { version = "4.5.47", features = ["derive"] }
 zip = { version = "7.0.0", default-features = false }
 walkdir = "2.5.0"
+blake2 = "0.10.6"
+file-hashing = "0.1.2"
+itertools = "0.14.0"
 
 [workspace.package]
 description = "A simple Rust tool for syncing directories with change detection"
