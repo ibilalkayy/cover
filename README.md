@@ -21,8 +21,6 @@
 
 - [What is Cover?](#what-is-cover)
 - [Features](#features)
-  - [Present Features](#present-features)
-  - [Upcoming Features](#upcoming-features)
 - [Docs](#docs)
 - [Get Started](#get-started)
 - [Installation](#installation)
