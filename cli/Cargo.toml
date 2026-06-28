@@ -10,4 +10,4 @@ categories.workspace = true
 
 [dependencies]
 clap.workspace = true
-cover-files = { version = "0.1.26", path = "../crates/cover_files" }
+cover-files = { version = "0.1.27", path = "../crates/cover_files" }
