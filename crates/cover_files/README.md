@@ -12,19 +12,9 @@ This crate is meant to be used by the [`cover`](https://crates.io/crates/cover) 
 
 ## Features
 
-### Current Features
-
 - **Sync** files and directories between source and destination
 - **Change Detection**: sync only changed files
 - **Delete Mode**: remove files in destination that no longer exist in source
-
-### Upcoming Features
-
-- **Archive** projects into `.zip` or `.tar.gz`
-- **Restore** backups
-- **Schedule** automatic backups (daily, weekly, interval-based)
-- **List** archives and scheduled jobs
-- **Clean** old backups with rules (`--keep-last`, `--older-than`)
 
 ## Docs
 

@@ -1,9 +1,6 @@
 use clap::{Parser, Subcommand};
 
-use crate::flags::{
-    archive::ArchiveData, clean::CleanData, list::ListData, restore::RestoreData,
-    schedule::ScheduleData, sync::SyncData,
-};
+use crate::flags::sync::SyncData;
 
 /// Takes the first command that starts the application
 ///
@@ -26,19 +23,4 @@ pub struct Cover {
 pub enum Command {
     /// Keep two folders in sync with each other
     Sync(SyncData),
-
-    /// Create a compressed backup file
-    Archive(ArchiveData),
-
-    /// Restore from an archive or backup folder
-    Restore(RestoreData),
-
-    /// Setup automatic backups
-    Schedule(ScheduleData),
-
-    /// Show history of backups or schedule jobs
-    List(ListData),
-
-    /// Remove old backup to save space
-    Clean(CleanData),
 }

@@ -35,17 +35,7 @@ Cover is a Rust application where the source and destination are synced and any 
 
 ## Features
 
-### Present Features
-
 - **Sync** files and folders of source with destination
-
-### Upcoming Features
-
-- **Archive** projects into `.zip` or `.tar.gz`
-- **Restore** from backups easily
-- **Schedule** automatic backups (daily, weekly, interval-based)
-- **List** archives and scheduled jobs
-- **Clean** old backups with rules (`--keep-last`, `--older-than`)
 
 ## Docs
 
